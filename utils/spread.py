@@ -3,8 +3,6 @@ from datetime import datetime, timedelta
 import gspread
 from config import Config
 
-FUTURE_DATE = datetime.today().date() + timedelta(days=Config.DAYS_IN_ADVANCE)
-
 
 def get_cloud_storage_client():
     if Config.IS_EMPTY:
@@ -16,6 +14,10 @@ def get_cloud_storage_client():
 
 
 def get_next_revaluation():
+    FUTURE_DATE = datetime.today().date() + timedelta(
+        days=Config.DAYS_IN_ADVANCE
+    )
+
     try:
         g_cloud_client = get_cloud_storage_client()
 
@@ -24,28 +26,6 @@ def get_next_revaluation():
 
             worksheet = sheet.worksheet("Reavaliação")
             dict_of_values = worksheet.get_all_records()
-
-            dict_of_values.append(
-                {
-                    "Membro": "Pessoa Teste 1",
-                    "Última reavaliação": "23/12/2022",
-                    "Próxima reavaliação": FUTURE_DATE.strftime("%d/%m/%Y"),
-                    "Treinador (hard)": "João Pedro",
-                    "PED": "Eduardo",
-                    "Link da última reavaliação": "Link",
-                }
-            )
-
-            dict_of_values.append(
-                {
-                    "Membro": "Pessoa Teste 2",
-                    "Última reavaliação": "23/12/2022",
-                    "Próxima reavaliação": FUTURE_DATE.strftime("%d/%m/%Y"),
-                    "Treinador (hard)": "João Pedro",
-                    "PED": "Eduardo",
-                    "Link da última reavaliação": "Link",
-                }
-            )
 
             dict_of_values = [
                 {
