@@ -38,7 +38,7 @@ class Config(metaclass=SingletonMeta):
     CARGOS = CARGOS.split(",") if CARGOS else None
 
     # Channel to be notified (revaluation)
-    INFO_CHANNEL = getenv("INFO_CHANNEL", default="")
+    INFO_CHANNEL = int(getenv("INFO_CHANNEL", default=0))
 
     # Time to check the revaluation
     HOUR = int(getenv("HOUR", default=8))

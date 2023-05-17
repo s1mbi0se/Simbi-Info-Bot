@@ -36,7 +36,7 @@ class Revaluation(commands.Cog):
         ):
             return
 
-        channel = self.bot.get_channel(int(Config.INFO_CHANNEL))
+        channel = self.bot.get_channel(Config.INFO_CHANNEL)
 
         LIST_OF_MEMBERS = get_next_revaluation()
 
@@ -59,7 +59,10 @@ class Revaluation(commands.Cog):
                 else None
             )
             cargo_mentions = (
-                (" ".join([cargo.mention for cargo in cargos]) + "\n")
+                (
+                    " ".join([cargo.mention for cargo in cargos if cargos])
+                    + "\n"
+                )
                 if cargos
                 else None
             )
