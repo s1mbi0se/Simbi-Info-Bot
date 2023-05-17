@@ -50,15 +50,22 @@ class Revaluation(commands.Cog):
                 )
 
             cargo_ids = Config.CARGOS
-            cargos = [
-                channel.guild.get_role(int(cargo_id)) for cargo_id in cargo_ids
-            ]
+            cargos = (
+                [
+                    channel.guild.get_role(int(cargo_id))
+                    for cargo_id in cargo_ids
+                ]
+                if cargo_ids
+                else None
+            )
             cargo_mentions = (
-                " ".join([cargo.mention for cargo in cargos]) + "\n"
+                (" ".join([cargo.mention for cargo in cargos]) + "\n")
+                if cargos
+                else None
             )
 
             await channel.send(
-                f"{cargo_mentions}"
+                f"{cargo_mentions if cargo_mentions else ''}"
                 f"**REAVALIAÇÃO À VISTA!**\n\n"
                 f"{response}"
             )

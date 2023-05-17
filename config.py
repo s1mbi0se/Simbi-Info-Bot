@@ -34,7 +34,10 @@ class Config(metaclass=SingletonMeta):
     TOKEN = getenv("TOKEN", default=None)
 
     # Cargos and channel to be notified (revaluation)
-    CARGOS = getenv("CARGOS_LIST", default="").split(",")
+    CARGOS = getenv("CARGOS_LIST", default=None)
+    CARGOS = CARGOS.split(",") if CARGOS else None
+
+    # Channel to be notified (revaluation)
     INFO_CHANNEL = getenv("INFO_CHANNEL", default="")
 
     # Time to check the revaluation
