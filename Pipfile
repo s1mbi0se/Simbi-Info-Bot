@@ -12,6 +12,7 @@ isort = "*"
 black = "*"
 flake8 = "*"
 pyproject-flake8 = "*"
+gdown = "*"
 
 [dev-packages]
 

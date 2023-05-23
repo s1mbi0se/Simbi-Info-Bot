@@ -41,11 +41,20 @@ class Config(metaclass=SingletonMeta):
     INFO_CHANNEL = int(getenv("INFO_CHANNEL", default=0))
 
     # Time to check the revaluation
-    HOUR = int(getenv("HOUR", default=8))
-    MINUTE = int(getenv("MINUTE", default=30))
+    HOUR = int(getenv("HOUR", default=10))
+    MINUTE = int(getenv("MINUTE", default=0))
 
     # Days in advance to check the revaluation
     DAYS_IN_ADVANCE = int(getenv("DAYS_IN_ADVANCE", default=15))
+
+    BIRTHDAY_SHEET = getenv("BIRTHDAY_SHEET", default="")
+    BIRTHDAY_CHANNEL = int(getenv("BIRTHDAY_CHANNEL", default=0))
+
+    BIRTHDAY_CARGOS = getenv("BIRTHDAY_CARGO_MENTION", default=None)
+    BIRTHDAY_CARGOS = BIRTHDAY_CARGOS.split(",") if BIRTHDAY_CARGOS else None
+
+    BIRTH_HOUR = int(getenv("BIRTH_HOUR", default=8))
+    BIRTH_MINUTE = int(getenv("BIRTH_MINUTE", default=30))
 
     # Google Service Account Access Credentials
     CREDENTIALS: dict = {
