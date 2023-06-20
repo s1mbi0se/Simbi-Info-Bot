@@ -8,6 +8,7 @@ from discord.ext import commands, tasks
 
 from utils.birthday import get_birthdays
 from utils.get_time import get_time_from_api
+from utils.logging import write_error_log, write_report_log
 
 EVERY_DAY = datetime.time(
     hour=Config.BIRTH_HOUR, minute=Config.BIRTH_MINUTE, tzinfo=Config.TIME_ZONE
@@ -38,8 +39,7 @@ class Birth(commands.Cog):
         ):
             return
 
-        with open("birth_report.log", "a") as f:
-            f.write(f'{now}: "Starting daily birth check"\n')
+        write_report_log(sender="BIRTH", msg="Starting daily birth check")
 
         try:
             channel = self.bot.get_channel(Config.BIRTHDAY_CHANNEL)
@@ -56,7 +56,7 @@ class Birth(commands.Cog):
                     pix += (
                         f"Chave PIX para quem quiser/puder"
                         f" enviar um presentinho para"
-                        f" {member['Membro'].split(' ')[0]}: {member['PIX']} \n" # noqa
+                        f" {member['Membro'].split(' ')[0]}: {member['PIX']} \n"  # noqa
                         if member["PIX"]
                         else ""
                     )
@@ -102,9 +102,7 @@ class Birth(commands.Cog):
             else:
                 return
         except Exception as e:
-            now = get_time_from_api()
-            with open("error.log", "a") as f:
-                f.write(f"{now}: BIRTH ERROR: {str(e)}\n")
+            write_error_log(sender="BIRTH", msg=str(e))
 
 
 async def setup(bot):

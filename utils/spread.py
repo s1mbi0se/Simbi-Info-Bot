@@ -4,6 +4,7 @@ import gspread
 from config import Config
 
 from utils.get_time import get_time_from_api
+from utils.logging import write_error_log
 
 
 def get_cloud_storage_client():
@@ -51,6 +52,4 @@ def get_next_revaluation():
             return filtered_records if filtered_records else None
 
     except Exception as e:
-        now = get_time_from_api()
-        with open("error.log", "a") as f:
-            f.write(f"{now}: {str(e)}\n")
+        write_error_log(sender="REVALUATION SPREAD", msg=str(e))

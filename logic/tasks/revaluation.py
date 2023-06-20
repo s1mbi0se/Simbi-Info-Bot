@@ -4,6 +4,7 @@ from config import Config
 from discord.ext import commands, tasks
 
 from utils.get_time import get_time_from_api
+from utils.logging import write_error_log, write_report_log
 from utils.spread import get_next_revaluation
 
 EVERY_DAY = datetime.time(
@@ -35,8 +36,9 @@ class Revaluation(commands.Cog):
         ):
             return
 
-        with open("revaluation_report.log", "a") as f:
-            f.write(f'{now}: "Starting daily revaluation check"\n')
+        write_report_log(
+            sender="REVALUATION", msg="Starting daily revaluation check"
+        )
 
         try:
             channel = self.bot.get_channel(Config.INFO_CHANNEL)
@@ -78,9 +80,7 @@ class Revaluation(commands.Cog):
             else:
                 return
         except Exception as e:
-            now = get_time_from_api()
-            with open("error.log", "a") as f:
-                f.write(f"{now}: REVALUATION ERROR: {str(e)}\n")
+            write_error_log(sender="REVALUATION", msg=str(e))
 
 
 async def setup(bot):
