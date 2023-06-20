@@ -1,5 +1,6 @@
 from os import getenv
 
+import pytz
 from dotenv import load_dotenv
 
 
@@ -74,3 +75,5 @@ class Config(metaclass=SingletonMeta):
     }
 
     IS_EMPTY = _verify_credentials(CREDENTIALS)
+
+    TIME_ZONE = pytz.timezone("America/Sao_Paulo")

@@ -3,6 +3,8 @@ from datetime import datetime
 import gspread
 from config import Config
 
+from utils.get_time import get_time_from_api
+
 
 def get_cloud_storage_client():
     if Config.IS_EMPTY:
@@ -14,7 +16,7 @@ def get_cloud_storage_client():
 
 
 def get_birthdays():
-    TODAY = datetime.today().date()
+    TODAY = get_time_from_api().date()
 
     try:
         g_cloud_client = get_cloud_storage_client()
@@ -55,7 +57,9 @@ def get_birthdays():
             return filtered_records if filtered_records else None
 
     except Exception as e:
-        raise e
+        now = get_time_from_api()
+        with open("error.log", "a") as f:
+            f.write(f"{now}: {str(e)}\n")
 
 
 if __name__ == "__main__":

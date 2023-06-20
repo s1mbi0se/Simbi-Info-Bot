@@ -3,6 +3,8 @@ from datetime import datetime, timedelta
 import gspread
 from config import Config
 
+from utils.get_time import get_time_from_api
+
 
 def get_cloud_storage_client():
     if Config.IS_EMPTY:
@@ -14,7 +16,7 @@ def get_cloud_storage_client():
 
 
 def get_next_revaluation():
-    FUTURE_DATE = datetime.today().date() + timedelta(
+    FUTURE_DATE = get_time_from_api().date() + timedelta(
         days=Config.DAYS_IN_ADVANCE
     )
 
@@ -48,5 +50,7 @@ def get_next_revaluation():
 
             return filtered_records if filtered_records else None
 
-    except Exception:
-        return None
+    except Exception as e:
+        now = get_time_from_api()
+        with open("error.log", "a") as f:
+            f.write(f"{now}: {str(e)}\n")

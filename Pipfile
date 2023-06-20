@@ -13,6 +13,7 @@ black = "*"
 flake8 = "*"
 pyproject-flake8 = "*"
 gdown = "*"
+httpx = "*"
 
 [dev-packages]
 
