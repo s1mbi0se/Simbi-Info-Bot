@@ -61,7 +61,9 @@ class Birth(commands.Cog):
                         else ""
                     )
 
-                    image_request = httpx.get(member.get("Foto"))
+                    image_request = httpx.get(
+                        member.get("Foto"), follow_redirects=True
+                    )
                     image_bytes = BytesIO(image_request.content)
 
                     discord_file = File(
