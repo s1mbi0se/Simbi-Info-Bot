@@ -93,7 +93,7 @@ class Birth(commands.Cog):
 
                 await channel.send(
                     f"{cargo_mentions if cargo_mentions else ''}"
-                    f"**HOJE É DIA DE COMEMORAR!**\n\n"
+                    f"**HOJE É DIA DE  COMEMORAR!**\n\n"
                     f"Hoje comemoramos a vida de {names} 🎉 🎉\n"
                     f"Parabéns! Muitas felicidades,"
                     f" que este novo ciclo que se inicia "
