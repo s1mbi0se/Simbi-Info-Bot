@@ -32,7 +32,7 @@ def get_birthdays():
                 {
                     k: (
                         datetime.strptime(v, "%d/%m/%Y")
-                        if k == "Nascimento"
+                        if k == "Nascimento" and v
                         else v
                     )
                     for k, v in record.items()
