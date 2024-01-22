@@ -19,6 +19,10 @@ def get_cloud_storage_client():
 def get_birthdays():
     TODAY = get_time_from_api().date()
 
+    # TODAY = datetime.strptime(
+    #     '2024-01-05T17:17:46.583955-03:00', "%Y-%m-%dT%H:%M:%S.%f%z"
+    # ).date()
+
     try:
         g_cloud_client = get_cloud_storage_client()
 

@@ -91,6 +91,18 @@ class Birth(commands.Cog):
                     else None
                 )
 
+                # await channel.send(
+                #     f"{cargo_mentions if cargo_mentions else ''}"
+                #     f"**MINHAS SINCERAS E ELETRÔNICAS DESCULPAS...**\n\n"
+                #     f"Nesse mês tivemos o aniversário de {names}, mas eu estava fora do ar 💥💥\n"  # NOQA
+                #     f"De qualquer forma, vamos comemorar a vida de {names} 🎉 🎉\n"  # NOQA
+                #     f"Parabéns! Muitas felicidades,"
+                #     f" que este novo ciclo que se inicia "
+                #     f"seja repleto de realizações e conquistas! \n\n"
+                #     f"{pix}",
+                #     files=discord_files,
+                # )
+
                 await channel.send(
                     f"{cargo_mentions if cargo_mentions else ''}"
                     f"**HOJE É DIA DE  COMEMORAR!**\n\n"
