@@ -33,11 +33,13 @@ class Birth(commands.Cog):
         now = get_time_from_api()
         current_time = now.time()
 
-        # if (
-        #     current_time.hour != EVERY_DAY.hour
-        #     or current_time.minute != EVERY_DAY.minute
-        # ):
-        #     return
+        if (
+            current_time.hour != EVERY_DAY.hour
+            or current_time.minute != EVERY_DAY.minute
+        ):
+            return
+
+        print(f'SEARCHING BIRTH: {now.date()} - {now.time()}')
 
         write_report_log(sender="BIRTH", msg="Starting daily birth check")
 
