@@ -39,7 +39,7 @@ class Birth(commands.Cog):
         ):
             return
 
-        print(f'SEARCHING BIRTH: {now.date()} - {now.time()}')
+        print(f"SEARCHING BIRTH: {now.date()} - {now.time()}")
 
         write_report_log(sender="BIRTH", msg="Starting daily birth check")
 
