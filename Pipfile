@@ -14,6 +14,7 @@ flake8 = "*"
 pyproject-flake8 = "*"
 gdown = "*"
 httpx = "*"
+emoji = "*"
 
 [dev-packages]
 
