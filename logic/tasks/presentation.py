@@ -16,7 +16,7 @@ class Presentation(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        allowed_channel_id = os.getenv("CHANNEL_ALLOWED_FOR_PRESENTATION")
+        allowed_channel_id = int(os.getenv("CHANNEL_ALLOWED_FOR_PRESENTATION", default=0))
         if message.author == self.bot.user or message.channel.id != allowed_channel_id:
             return
 
