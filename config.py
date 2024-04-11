@@ -38,9 +38,6 @@ class Config(metaclass=SingletonMeta):
     BIRTHDAY_CARGOS = getenv("BIRTHDAY_CARGO_MENTION", default=None)
     BIRTHDAY_CARGOS = BIRTHDAY_CARGOS.split(",") if BIRTHDAY_CARGOS else None
 
-    BIRTH_HOUR = int(getenv("BIRTH_HOUR", default=8))
-    BIRTH_MINUTE = int(getenv("BIRTH_MINUTE", default=30))
-
     # Google Service Account Access Credentials
     CREDENTIALS: dict = {
         "type": getenv("TYPE", default=""),
