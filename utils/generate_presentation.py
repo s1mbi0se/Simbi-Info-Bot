@@ -2,9 +2,7 @@ import os.path
 
 import emoji
 from dotenv import load_dotenv
-from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
+from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
@@ -21,20 +19,10 @@ SCOPES = [
 
 
 def main():
-    creds = None
-    if os.path.exists("token.json"):
-        creds = Credentials.from_authorized_user_file("token.json", SCOPES)
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                "credentials.json", SCOPES
-            )
-            creds = flow.run_local_server(port=0)
-        with open("token.json", "w") as token:
-            token.write(creds.to_json())
-
+    creds = Credentials.from_service_account_file(
+        'credentials.json',
+        scopes=SCOPES
+    )
     try:
         print(
             emoji.emojize(
@@ -81,13 +69,13 @@ def main():
         )
 
         # Posição exata dos slides que serão clonados.
-        item_slide_original_index = 2
+        item_slide_original_position = 2
         item_slide_original_id = presentation_copy.get("slides")[
-            item_slide_original_index
+            item_slide_original_position
         ]["objectId"]
-        next_sprint_item_slide = 4
+        next_sprint_item_slide_position = 5
         next_sprint_item_slide_id = presentation_copy.get("slides")[
-            next_sprint_item_slide
+            next_sprint_item_slide_position
         ]["objectId"]
         items_per_slide = 3
 
