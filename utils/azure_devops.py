@@ -81,9 +81,14 @@ def get_azure_object(
     current_sprint_path,
     current_sprint_number,
 ):
+    effort_dict = {
+        "estimated": 0,
+        "delivered": 0,
+    }
     azure_object = {
         "project": project_name,
         "sprint": current_sprint_number,
+        "effort": effort_dict,
         "work_items": [],
         "next_sprint": [],
     }
@@ -93,7 +98,7 @@ def get_azure_object(
         organization_url,
         credentials,
         current_sprint_path,
-        azure_object["work_items"],
+        azure_object,
         is_current_sprint=True,
     )
 
@@ -102,7 +107,7 @@ def get_azure_object(
         organization_url,
         credentials,
         current_sprint_path,
-        azure_object["next_sprint"],
+        azure_object,
     )
 
     return azure_object
@@ -112,15 +117,20 @@ def process_work_items_for_sprint(
     organization_url,
     credentials,
     current_sprint_path,
-    sprint_list,
+    azure_object,
     is_current_sprint=False,
 ):
+    effort_estimated_list = []
+    effort_delivered_list = []
+
     if is_current_sprint:
         state_condition = "!= 'New'"
         state_condition_task = "IN ('Done', 'In Progress')"
+        sprint_list = azure_object["work_items"]
     else:
         state_condition = "!= 'Done'"
         state_condition_task = "!= 'Done'"
+        sprint_list = azure_object["next_sprint"]
 
     # Consulta para retornar work items e suas tasks
     work_item_query = Wiql(
@@ -148,11 +158,14 @@ def process_work_items_for_sprint(
                 else work_item_type
             )
 
+            work_item_effort = int(work_item.fields.get("Microsoft.VSTS.Scheduling.Effort", 0))
+
             work_item_dict = {
                 "id": work_item.id,
                 "type": work_item_type,
                 "state": work_item.fields["System.State"],
                 "title": work_item.fields["System.Title"],
+                "effort": work_item_effort,
                 "tasks": [],
             }
 
@@ -177,15 +190,31 @@ def process_work_items_for_sprint(
                     task = work_item_tracking_client.get_work_item(
                         id=task_item.id
                     )
+
+                    task_effort = int(task.fields.get("Microsoft.VSTS.Scheduling.Effort", 0))
+
+                    if task.fields["System.State"] == "Done":
+                        effort_delivered_list.append(task_effort)
+                    else:
+                        effort_estimated_list.append(task_effort)
+
                     task_dict = {
                         "task_id": task.id,
                         "task_type": task.fields["System.WorkItemType"],
                         "task_state": task.fields["System.State"],
                         "task_title": task.fields["System.Title"],
+                        "task_effort": task_effort
                     }
                     work_item_dict["tasks"].append(task_dict)
 
             sprint_list.append(work_item_dict)
+
+    if is_current_sprint:
+        total_effort_delivered = sum(effort_delivered_list)
+        azure_object["effort"]["delivered"] = total_effort_delivered
+    else:
+        total_effort_estimated = sum(effort_estimated_list) + azure_object["effort"]["delivered"]
+        azure_object["effort"]["estimated"] = total_effort_estimated
 
 
 if __name__ == "__main__":
