@@ -49,18 +49,19 @@ def main():
         next_sprint_number = int(azure_object["sprint"]) + 1
 
         print(emoji.emojize(":blue_circle: Alterando textos globalmente"))
-        replace_text_globally(
-            slide_service,
-            presentation_copy_id,
-            "{{sprint}}",
-            azure_object["sprint"],
-        )
-        replace_text_globally(
-            slide_service,
-            presentation_copy_id,
-            "{{next_s}}",
-            str(next_sprint_number),
-        )
+        replacements = [
+            ("{{sprint}}", azure_object["sprint"]),
+            ("{{next_s}}", str(next_sprint_number)),
+            ("{{eff_estimated}}", str(azure_object["effort"]["estimated"])),
+            ("{{eff_delivered}}", str(azure_object["effort"]["delivered"])),
+        ]
+        for search, replace in replacements:
+            replace_text_globally(
+                slide_service,
+                presentation_copy_id,
+                search,
+                replace,
+            )
 
         presentation_copy = (
             slide_service.presentations()
@@ -68,15 +69,17 @@ def main():
             .execute()
         )
 
-        # Posição exata dos slides que serão clonados.
-        item_slide_original_position = 2
+        # Posição exata (index) dos slides que serão clonados.
+        item_slide_original_index = 2
         item_slide_original_id = presentation_copy.get("slides")[
-            item_slide_original_position
+            item_slide_original_index
         ]["objectId"]
-        next_sprint_item_slide_position = 5
+
+        next_sprint_item_slide_index = 5
         next_sprint_item_slide_id = presentation_copy.get("slides")[
-            next_sprint_item_slide_position
+            next_sprint_item_slide_index
         ]["objectId"]
+
         items_per_slide = 3
 
         print(emoji.emojize(":blue_circle: Gerando slides com work items"))
