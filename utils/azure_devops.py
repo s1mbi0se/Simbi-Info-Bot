@@ -198,11 +198,15 @@ def process_work_items_for_sprint(
                     else:
                         effort_estimated_list.append(task_effort)
 
+                    task_title = task.fields["System.Title"]
+                    if task.fields["System.State"] == "In Progress":
+                        task_title += " (em andamento)"
+
                     task_dict = {
                         "task_id": task.id,
                         "task_type": task.fields["System.WorkItemType"],
                         "task_state": task.fields["System.State"],
-                        "task_title": task.fields["System.Title"],
+                        "task_title": task_title,
                         "task_effort": task_effort
                     }
                     work_item_dict["tasks"].append(task_dict)
