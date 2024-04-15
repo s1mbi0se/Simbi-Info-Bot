@@ -1,11 +1,12 @@
 import os
+import emoji
 from azure.devops.v7_1.work_item_tracking import Wiql, WorkItemTrackingClient
 from dotenv import load_dotenv
-from base import AzureMercadoTopografico
+from utils.mercado_topografico.azure_devops.base import AzureMercadoTopografico
 load_dotenv()
 
 
-def get_estimated_efforts():
+def estimated_efforts():
     personal_access_token = os.getenv("PERSONAL_ACCESS_TOKEN")
     organization_url = os.getenv("ORGANIZATION_URL")
     project_name = os.getenv("PROJECT_NAME")
@@ -25,17 +26,20 @@ def get_estimated_efforts():
     )
     work_item_list = work_item_tracking_client.query_by_wiql(work_item_query)
 
-    friendly_message = f"Aqui estão as Estimativas para a Sprint {mercado_topografico.current_sprint_number}:\n"
+    friendly_message = f"Essas são as **Estimativas para a Sprint {mercado_topografico.current_sprint_number}**:\n\n"
 
     if work_item_list.work_items is not None:
         for item in work_item_list.work_items:
             work_item = work_item_tracking_client.get_work_item(id=item.id)
 
-            friendly_message += (f"{work_item.fields['System.Title']}: "
-                                 f"{int(work_item.fields.get('Microsoft.VSTS.Scheduling.Effort', 0))}\n")
+            friendly_message += (f":small_blue_diamond: {work_item.fields['System.Title']}: "
+                                 f"**{int(work_item.fields.get('Microsoft.VSTS.Scheduling.Effort', 0))}**\n")
 
+    print(
+        emoji.emojize(":thumbs_up: Estimativas obtidas com sucesso!")
+    )
     return friendly_message
 
 
 if __name__ == "__main__":
-    get_estimated_efforts()
+    estimated_efforts()

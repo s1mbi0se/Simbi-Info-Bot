@@ -1,7 +1,7 @@
 import os
 import emoji
 from azure.devops.v7_1.work_item_tracking import Wiql, WorkItemTrackingClient
-from base import AzureMercadoTopografico
+from utils.mercado_topografico.azure_devops.base import AzureMercadoTopografico
 from dotenv import load_dotenv
 
 load_dotenv()
