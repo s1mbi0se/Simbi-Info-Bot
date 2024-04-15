@@ -1,12 +1,8 @@
 import os
-import re
-
 import emoji
-from azure.devops.connection import Connection
-from azure.devops.v7_1.work import TeamContext
 from azure.devops.v7_1.work_item_tracking import Wiql, WorkItemTrackingClient
+from base import AzureMercadoTopografico
 from dotenv import load_dotenv
-from msrest.authentication import BasicAuthentication
 
 load_dotenv()
 
@@ -15,63 +11,19 @@ def get_azure_work_items():
     personal_access_token = os.getenv("PERSONAL_ACCESS_TOKEN")
     organization_url = os.getenv("ORGANIZATION_URL")
     project_name = os.getenv("PROJECT_NAME")
+    team_name = os.getenv("TEAM_NAME")
 
-    credentials = BasicAuthentication("", personal_access_token)
-    connection = Connection(base_url=organization_url, creds=credentials)
-    core_client = connection.clients.get_core_client()
-
-    project_id = get_project_id(core_client)
-
-    team_id = get_team_id(core_client, project_id)
-
-    current_sprint_path, current_sprint_number = get_current_sprint(
-        connection, project_id, team_id
-    )
+    mercado_topografico = AzureMercadoTopografico(personal_access_token, organization_url, project_name, team_name)
 
     azure_object = get_azure_object(
         organization_url,
-        credentials,
+        mercado_topografico.credentials,
         project_name,
-        current_sprint_path,
-        current_sprint_number,
+        mercado_topografico.current_sprint_path,
+        mercado_topografico.current_sprint_number,
     )
 
     return azure_object
-
-
-def get_project_id(core_client):
-    project_name = os.getenv("PROJECT_NAME")
-    project_id = None
-    get_projects_response = core_client.get_projects()
-    for project in get_projects_response:
-        if project.name == project_name:
-            project_id = project.id
-            print(emoji.emojize("  :check_mark_button: Nome do projeto"))
-    return project_id
-
-
-def get_team_id(core_client, project_id):
-    team_name = os.getenv("TEAM_NAME")
-    team_id = None
-    get_teams_response = core_client.get_teams(project_id=project_id)
-    for team in get_teams_response:
-        if team.name == team_name:
-            team_id = team.id
-            print(emoji.emojize("  :check_mark_button: Informações da equipe"))
-    return team_id
-
-
-def get_current_sprint(connection, project_id, team_id):
-    work_client = connection.clients.get_work_client()
-    team_context = TeamContext(project_id=project_id, team_id=team_id)
-    current_sprint = work_client.get_team_iterations(
-        team_context=team_context, timeframe="Current"
-    )
-    current_sprint_path = current_sprint[0].path
-    current_sprint_path = current_sprint_path.replace("\\", "\\\\")
-    current_sprint_number = re.findall(r"\d+", current_sprint[0].name)[0]
-    print(emoji.emojize("  :check_mark_button: Dados da sprint atual"))
-    return current_sprint_path, current_sprint_number
 
 
 def get_azure_object(
@@ -158,7 +110,7 @@ def process_work_items_for_sprint(
                 else work_item_type
             )
 
-            work_item_effort = int(work_item.fields.get("Microsoft.VSTS.Scheduling.Effort", 0))
+            work_item_effort = work_item.fields.get("Microsoft.VSTS.Scheduling.Effort", 0)
 
             work_item_dict = {
                 "id": work_item.id,

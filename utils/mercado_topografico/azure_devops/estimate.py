@@ -1,6 +1,4 @@
-import json
 import os
-
 from azure.devops.v7_1.work_item_tracking import Wiql, WorkItemTrackingClient
 from dotenv import load_dotenv
 from base import AzureMercadoTopografico
@@ -36,9 +34,7 @@ def get_estimated_efforts():
             friendly_message += (f"{work_item.fields['System.Title']}: "
                                  f"{int(work_item.fields.get('Microsoft.VSTS.Scheduling.Effort', 0))}\n")
 
-    print(friendly_message)
-
-#     TODO NÃO ESQUECER DO RETURN
+    return friendly_message
 
 
 if __name__ == "__main__":
