@@ -1,10 +1,15 @@
 import os.path
+
 import emoji
 from dotenv import load_dotenv
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-from utils.mercado_topografico.azure_devops.work_items import get_azure_work_items
+
+from utils.mercado_topografico.azure_devops.work_items import (
+    get_azure_work_items
+)
+
 load_dotenv()
 
 SCOPES = [
@@ -17,8 +22,7 @@ SCOPES = [
 
 def generate_presentation():
     creds = Credentials.from_service_account_file(
-        'credentials.json',
-        scopes=SCOPES
+        "credentials.json", scopes=SCOPES
     )
     try:
         print(

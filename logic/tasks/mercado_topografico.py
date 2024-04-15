@@ -5,7 +5,9 @@ from discord.utils import get
 from dotenv import load_dotenv
 
 from utils.mercado_topografico.azure_devops.estimate import estimated_efforts
-from utils.mercado_topografico.google_apis.presentation import generate_presentation
+from utils.mercado_topografico.google_apis.presentation import (
+    generate_presentation
+)
 
 load_dotenv()
 

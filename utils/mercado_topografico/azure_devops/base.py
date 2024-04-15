@@ -1,20 +1,32 @@
 import re
-import emoji
 
+import emoji
 from azure.devops.connection import Connection
 from azure.devops.v7_1.work import TeamContext
 from msrest.authentication import BasicAuthentication
 
 
 class AzureMercadoTopografico:
-    def __init__(self, personal_access_token, organization_url, project_name, team_name):
+    def __init__(
+        self, personal_access_token, organization_url, project_name, team_name
+    ):
         self.credentials = BasicAuthentication("", personal_access_token)
-        self.connection = Connection(base_url=organization_url, creds=self.credentials)
+        self.connection = Connection(
+            base_url=organization_url, creds=self.credentials
+        )
         self.core_client = self.connection.clients.get_core_client()
 
-        self.project_id = self._get_project_id_by_name(self.core_client, project_name)
-        self.team_id = self._get_team_id_by_name(self.core_client, team_name, self.project_id)
-        self.current_sprint_path, self.current_sprint_number = self._get_current_sprint(self.connection, self.project_id, self.team_id)
+        self.project_id = self._get_project_id_by_name(
+            self.core_client, project_name
+        )
+        self.team_id = self._get_team_id_by_name(
+            self.core_client, team_name, self.project_id
+        )
+        self.current_sprint_path, self.current_sprint_number = (
+            self._get_current_sprint(
+                self.connection, self.project_id, self.team_id
+            )
+        )
 
     @staticmethod
     def _get_project_id_by_name(core_client, project_name):
@@ -33,7 +45,11 @@ class AzureMercadoTopografico:
         for team in get_teams_response:
             if team.name == team_name:
                 team_id = team.id
-                print(emoji.emojize("  :check_mark_button: Informações da equipe"))
+                print(
+                    emoji.emojize(
+                        "  :check_mark_button: Informações da equipe"
+                    )
+                )
         return team_id
 
     @staticmethod

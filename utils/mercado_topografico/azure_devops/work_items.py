@@ -1,8 +1,10 @@
 import os
+
 import emoji
 from azure.devops.v7_1.work_item_tracking import Wiql, WorkItemTrackingClient
-from utils.mercado_topografico.azure_devops.base import AzureMercadoTopografico
 from dotenv import load_dotenv
+
+from utils.mercado_topografico.azure_devops.base import AzureMercadoTopografico
 
 load_dotenv()
 
@@ -13,7 +15,9 @@ def get_azure_work_items():
     project_name = os.getenv("PROJECT_NAME")
     team_name = os.getenv("TEAM_NAME")
 
-    mercado_topografico = AzureMercadoTopografico(personal_access_token, organization_url, project_name, team_name)
+    mercado_topografico = AzureMercadoTopografico(
+        personal_access_token, organization_url, project_name, team_name
+    )
 
     azure_object = get_azure_object(
         organization_url,
@@ -110,7 +114,9 @@ def process_work_items_for_sprint(
                 else work_item_type
             )
 
-            work_item_effort = work_item.fields.get("Microsoft.VSTS.Scheduling.Effort", 0)
+            work_item_effort = int(
+                work_item.fields.get("Microsoft.VSTS.Scheduling.Effort", 0)
+            )
 
             work_item_dict = {
                 "id": work_item.id,
@@ -143,7 +149,9 @@ def process_work_items_for_sprint(
                         id=task_item.id
                     )
 
-                    task_effort = int(task.fields.get("Microsoft.VSTS.Scheduling.Effort", 0))
+                    task_effort = int(
+                        task.fields.get("Microsoft.VSTS.Scheduling.Effort", 0)
+                    )
 
                     if task.fields["System.State"] == "Done":
                         effort_delivered_list.append(task_effort)
@@ -169,7 +177,9 @@ def process_work_items_for_sprint(
         total_effort_delivered = sum(effort_delivered_list)
         azure_object["effort"]["delivered"] = total_effort_delivered
     else:
-        total_effort_estimated = sum(effort_estimated_list) + azure_object["effort"]["delivered"]
+        total_effort_estimated = (
+            sum(effort_estimated_list) + azure_object["effort"]["delivered"]
+        )
         azure_object["effort"]["estimated"] = total_effort_estimated
 
 
