@@ -22,10 +22,9 @@ class MercadoTopografico(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        allowed_channel_id = 1214922291859947521
-        # allowed_channel_id = int(
-        #     os.getenv("CHANNEL_ALLOWED_FOR_PRESENTATION", default=0)
-        # )
+        allowed_channel_id = int(
+            os.getenv("CHANNEL_ALLOWED_FOR_PRESENTATION", default=0)
+        )
         if (
             message.author == self.bot.user
             or message.channel.id != allowed_channel_id
@@ -46,8 +45,7 @@ class MercadoTopografico(commands.Cog):
             "Um momento, estou preparando a apresentação..."
         )
         current_sprint, presentation_url = generate_presentation()
-        # mt_role_name = os.getenv("MT_ROLE_NAME")
-        mt_role_name = "squad 1"
+        mt_role_name = os.getenv("MT_ROLE_NAME")
         role = get(message.guild.roles, name=mt_role_name)
         await message.channel.send(
             f"{message.author.mention} e {role.mention} aqui está"
