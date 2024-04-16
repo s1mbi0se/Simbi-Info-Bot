@@ -2,13 +2,13 @@ import os.path
 
 import emoji
 from dotenv import load_dotenv
-from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
+from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-from utils.azure_devops import get_azure_work_items
+from utils.mercado_topografico.azure_devops.work_items import (
+    get_azure_work_items
+)
 
 load_dotenv()
 
@@ -20,21 +20,10 @@ SCOPES = [
 ]
 
 
-def main():
-    creds = None
-    if os.path.exists("token.json"):
-        creds = Credentials.from_authorized_user_file("token.json", SCOPES)
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                "credentials.json", SCOPES
-            )
-            creds = flow.run_local_server(port=0)
-        with open("token.json", "w") as token:
-            token.write(creds.to_json())
-
+def generate_presentation():
+    creds = Credentials.from_service_account_file(
+        "credentials.json", scopes=SCOPES
+    )
     try:
         print(
             emoji.emojize(
@@ -61,18 +50,19 @@ def main():
         next_sprint_number = int(azure_object["sprint"]) + 1
 
         print(emoji.emojize(":blue_circle: Alterando textos globalmente"))
-        replace_text_globally(
-            slide_service,
-            presentation_copy_id,
-            "{{sprint}}",
-            azure_object["sprint"],
-        )
-        replace_text_globally(
-            slide_service,
-            presentation_copy_id,
-            "{{next_s}}",
-            str(next_sprint_number),
-        )
+        replacements = [
+            ("{{sprint}}", azure_object["sprint"]),
+            ("{{next_s}}", str(next_sprint_number)),
+            ("{{eff_estimated}}", str(azure_object["effort"]["estimated"])),
+            ("{{eff_delivered}}", str(azure_object["effort"]["delivered"])),
+        ]
+        for search, replace in replacements:
+            replace_text_globally(
+                slide_service,
+                presentation_copy_id,
+                search,
+                replace,
+            )
 
         presentation_copy = (
             slide_service.presentations()
@@ -80,15 +70,17 @@ def main():
             .execute()
         )
 
-        # Posição exata dos slides que serão clonados.
+        # Posição exata (index) dos slides que serão clonados.
         item_slide_original_index = 2
         item_slide_original_id = presentation_copy.get("slides")[
             item_slide_original_index
         ]["objectId"]
-        next_sprint_item_slide = 4
+
+        next_sprint_item_slide_index = 5
         next_sprint_item_slide_id = presentation_copy.get("slides")[
-            next_sprint_item_slide
+            next_sprint_item_slide_index
         ]["objectId"]
+
         items_per_slide = 3
 
         print(emoji.emojize(":blue_circle: Gerando slides com work items"))
@@ -352,4 +344,4 @@ def delete_slide(slide_service, presentation_id: str, slide_id: str):
 
 
 if __name__ == "__main__":
-    main()
+    generate_presentation()

@@ -1,12 +1,10 @@
 import os
-import re
 
 import emoji
-from azure.devops.connection import Connection
-from azure.devops.v7_1.work import TeamContext
 from azure.devops.v7_1.work_item_tracking import Wiql, WorkItemTrackingClient
 from dotenv import load_dotenv
-from msrest.authentication import BasicAuthentication
+
+from utils.mercado_topografico.azure_devops.base import AzureMercadoTopografico
 
 load_dotenv()
 
@@ -15,63 +13,21 @@ def get_azure_work_items():
     personal_access_token = os.getenv("PERSONAL_ACCESS_TOKEN")
     organization_url = os.getenv("ORGANIZATION_URL")
     project_name = os.getenv("PROJECT_NAME")
+    team_name = os.getenv("TEAM_NAME")
 
-    credentials = BasicAuthentication("", personal_access_token)
-    connection = Connection(base_url=organization_url, creds=credentials)
-    core_client = connection.clients.get_core_client()
-
-    project_id = get_project_id(core_client)
-
-    team_id = get_team_id(core_client, project_id)
-
-    current_sprint_path, current_sprint_number = get_current_sprint(
-        connection, project_id, team_id
+    mercado_topografico = AzureMercadoTopografico(
+        personal_access_token, organization_url, project_name, team_name
     )
 
     azure_object = get_azure_object(
         organization_url,
-        credentials,
+        mercado_topografico.credentials,
         project_name,
-        current_sprint_path,
-        current_sprint_number,
+        mercado_topografico.current_sprint_path,
+        mercado_topografico.current_sprint_number,
     )
 
     return azure_object
-
-
-def get_project_id(core_client):
-    project_name = os.getenv("PROJECT_NAME")
-    project_id = None
-    get_projects_response = core_client.get_projects()
-    for project in get_projects_response:
-        if project.name == project_name:
-            project_id = project.id
-            print(emoji.emojize("  :check_mark_button: Nome do projeto"))
-    return project_id
-
-
-def get_team_id(core_client, project_id):
-    team_name = os.getenv("TEAM_NAME")
-    team_id = None
-    get_teams_response = core_client.get_teams(project_id=project_id)
-    for team in get_teams_response:
-        if team.name == team_name:
-            team_id = team.id
-            print(emoji.emojize("  :check_mark_button: Informações da equipe"))
-    return team_id
-
-
-def get_current_sprint(connection, project_id, team_id):
-    work_client = connection.clients.get_work_client()
-    team_context = TeamContext(project_id=project_id, team_id=team_id)
-    current_sprint = work_client.get_team_iterations(
-        team_context=team_context, timeframe="Current"
-    )
-    current_sprint_path = current_sprint[0].path
-    current_sprint_path = current_sprint_path.replace("\\", "\\\\")
-    current_sprint_number = re.findall(r"\d+", current_sprint[0].name)[0]
-    print(emoji.emojize("  :check_mark_button: Dados da sprint atual"))
-    return current_sprint_path, current_sprint_number
 
 
 def get_azure_object(
@@ -81,9 +37,14 @@ def get_azure_object(
     current_sprint_path,
     current_sprint_number,
 ):
+    effort_dict = {
+        "estimated": 0,
+        "delivered": 0,
+    }
     azure_object = {
         "project": project_name,
         "sprint": current_sprint_number,
+        "effort": effort_dict,
         "work_items": [],
         "next_sprint": [],
     }
@@ -93,7 +54,7 @@ def get_azure_object(
         organization_url,
         credentials,
         current_sprint_path,
-        azure_object["work_items"],
+        azure_object,
         is_current_sprint=True,
     )
 
@@ -102,7 +63,7 @@ def get_azure_object(
         organization_url,
         credentials,
         current_sprint_path,
-        azure_object["next_sprint"],
+        azure_object,
     )
 
     return azure_object
@@ -112,15 +73,20 @@ def process_work_items_for_sprint(
     organization_url,
     credentials,
     current_sprint_path,
-    sprint_list,
+    azure_object,
     is_current_sprint=False,
 ):
+    effort_estimated_list = []
+    effort_delivered_list = []
+
     if is_current_sprint:
         state_condition = "!= 'New'"
         state_condition_task = "IN ('Done', 'In Progress')"
+        sprint_list = azure_object["work_items"]
     else:
         state_condition = "!= 'Done'"
         state_condition_task = "!= 'Done'"
+        sprint_list = azure_object["next_sprint"]
 
     # Consulta para retornar work items e suas tasks
     work_item_query = Wiql(
@@ -148,11 +114,16 @@ def process_work_items_for_sprint(
                 else work_item_type
             )
 
+            work_item_effort = int(
+                work_item.fields.get("Microsoft.VSTS.Scheduling.Effort", 0)
+            )
+
             work_item_dict = {
                 "id": work_item.id,
                 "type": work_item_type,
                 "state": work_item.fields["System.State"],
                 "title": work_item.fields["System.Title"],
+                "effort": work_item_effort,
                 "tasks": [],
             }
 
@@ -177,15 +148,39 @@ def process_work_items_for_sprint(
                     task = work_item_tracking_client.get_work_item(
                         id=task_item.id
                     )
+
+                    task_effort = int(
+                        task.fields.get("Microsoft.VSTS.Scheduling.Effort", 0)
+                    )
+
+                    if task.fields["System.State"] == "Done":
+                        effort_delivered_list.append(task_effort)
+                    else:
+                        effort_estimated_list.append(task_effort)
+
+                    task_title = task.fields["System.Title"]
+                    if task.fields["System.State"] == "In Progress":
+                        task_title += " (em andamento)"
+
                     task_dict = {
                         "task_id": task.id,
                         "task_type": task.fields["System.WorkItemType"],
                         "task_state": task.fields["System.State"],
-                        "task_title": task.fields["System.Title"],
+                        "task_title": task_title,
+                        "task_effort": task_effort
                     }
                     work_item_dict["tasks"].append(task_dict)
 
             sprint_list.append(work_item_dict)
+
+    if is_current_sprint:
+        total_effort_delivered = sum(effort_delivered_list)
+        azure_object["effort"]["delivered"] = total_effort_delivered
+    else:
+        total_effort_estimated = (
+            sum(effort_estimated_list) + azure_object["effort"]["delivered"]
+        )
+        azure_object["effort"]["estimated"] = total_effort_estimated
 
 
 if __name__ == "__main__":
