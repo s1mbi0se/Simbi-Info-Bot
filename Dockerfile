@@ -5,7 +5,7 @@ FROM python:3.10-slim-buster
 WORKDIR /app
 
 # Copia o arquivo .env para o container
-COPY .env credentials.json token.json ./
+COPY .env credentials.json ./
 
 # Copia o arquivo de dependências para o container
 COPY Pipfile Pipfile.lock ./
