@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 from utils.mercado_topografico.azure_devops.estimate import estimated_efforts
 from utils.mercado_topografico.google_apis.presentation import (
-    generate_presentation
+    generate_presentation,
 )
 
 load_dotenv()
@@ -66,10 +66,10 @@ class MercadoTopografico(commands.Cog):
     @staticmethod
     async def send_invalid_command_message(message):
         await message.channel.send(
-            f"### Comando inválido\n"
-            f"Use um dos comandos abaixo:\n"
-            f"**!mt-presentation** para gerar a apresentação da sprint review\n"
-            f"**!mt-estimate** para obter as estimativas da sprint atual"
+            "### Comando inválido\n"
+            "Use um dos comandos abaixo:\n"
+            "**!mt-presentation** para gerar a apresentação da sprint review\n"
+            "**!mt-estimate** para obter as estimativas da sprint atual"
         )
 
     @commands.Cog.listener()

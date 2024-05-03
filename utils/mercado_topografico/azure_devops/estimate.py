@@ -23,7 +23,7 @@ def estimated_efforts():
         query=f"SELECT [System.Id], [System.Title], [System.State] "
         f"FROM WorkItems "
         f"WHERE [System.WorkItemType] IN ('Product Backlog Item', 'Bug') "
-        f"AND [System.IterationPath] = '{mercado_topografico.current_sprint_path}'"
+        f"AND [System.IterationPath] = '{mercado_topografico.current_sprint_path}'"  # noqa
     )
 
     work_item_tracking_client = WorkItemTrackingClient(
@@ -31,7 +31,10 @@ def estimated_efforts():
     )
     work_item_list = work_item_tracking_client.query_by_wiql(work_item_query)
 
-    friendly_message = f"Essas são as **Estimativas para a Sprint {mercado_topografico.current_sprint_number}**:\n\n"
+    friendly_message = (
+        "Essas são as **Estimativas para a Sprint"
+        f" {mercado_topografico.current_sprint_number}**:\n\n"
+    )
 
     if work_item_list.work_items is not None:
         for item in work_item_list.work_items:
@@ -39,7 +42,7 @@ def estimated_efforts():
 
             friendly_message += (
                 f":small_blue_diamond: {work_item.fields['System.Title']}: "
-                f"**{int(work_item.fields.get('Microsoft.VSTS.Scheduling.Effort', 0))}**\n"
+                f"**{int(work_item.fields.get('Microsoft.VSTS.Scheduling.Effort', 0))}**\n"  # noqa
             )
 
     print(emoji.emojize(":thumbs_up: Estimativas obtidas com sucesso!"))

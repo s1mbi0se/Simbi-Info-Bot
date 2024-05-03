@@ -14,4 +14,4 @@ lint:
 
 format:
 	isort .
-	black .
+	black . --target-version py310
