@@ -26,4 +26,4 @@ jobs:
       - name: Check for importing style
         run: pipenv run isort --profile=black --check --diff .
       - name: Look for auto format errors
-        run: pipenv run black --check --diff .
+        run: pipenv run black --check --diff . --target-version py310
