@@ -7,7 +7,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 from utils.mercado_topografico.azure_devops.work_items import (
-    get_azure_work_items
+    get_azure_work_items,
 )
 
 load_dotenv()

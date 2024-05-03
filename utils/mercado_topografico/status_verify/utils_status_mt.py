@@ -19,6 +19,7 @@ def ping_notify(url: str) -> str:
         write_error_log(sender=f"SERVICE -> {url}", msg=str(e))
         return "INTERNAL ERROR"
 
+
 def generate_message(name: str, status: str):
     match status:
         case "ON":

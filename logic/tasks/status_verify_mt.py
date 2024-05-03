@@ -4,7 +4,10 @@ from rocketry import Rocketry
 from rocketry.conditions.api import every
 
 from utils.get_time import get_time_from_api
-from utils.mercado_topografico.status_verify.utils_status_mt import ping_notify, generate_message
+from utils.mercado_topografico.status_verify.utils_status_mt import (
+    generate_message,
+    ping_notify,
+)
 
 schedule_status = Rocketry(
     config={
@@ -34,10 +37,10 @@ class Status(commands.Cog):
             channel = self.bot.get_channel(Config.MT_ALERTS_CHANNEL)
 
             title = (
-                f"** ##############    VERIFICAÇÃO DE STATUS"
+                "** ##############    VERIFICAÇÃO DE STATUS"
                 "    ############## **\n\n"
                 "```   Intervalo de Verificação: "
-                f"20 minutos ```"
+                "20 minutos ```"
             )
 
             now = get_time_from_api().strftime("%d de %B de %Y %H:%M:%S")
@@ -60,7 +63,6 @@ class Status(commands.Cog):
             last_message = await channel.fetch_message(last_message_id)
             last_message_content = last_message.content
 
-
             if "❌" in final_message or "💀" in final_message:
                 cargo_ids = Config.MT_ALERTS_CARGOS
 
@@ -75,25 +77,23 @@ class Status(commands.Cog):
 
                 cargo_mentions = (
                     (
-                            " ".join(
-                                [cargo.mention for cargo in cargos if cargos]
-                            )
-                            + "\n"
+                        " ".join([cargo.mention for cargo in cargos if cargos])
+                        + "\n"
                     )
                     if cargos
                     else None
                 )
 
-
                 await channel.send(
-                    final_message + f"\n{cargo_mentions if cargo_mentions else ''}"
-                                    f" Há serviços fora do ar! \n"
+                    final_message
+                    + f"\n{cargo_mentions if cargo_mentions else ''}"
+                    f" Há serviços fora do ar! \n"
                 )
             else:
                 if (
-                        title in last_message_content
-                        and "❌" not in last_message_content
-                        and "💀" not in last_message_content
+                    title in last_message_content
+                    and "❌" not in last_message_content
+                    and "💀" not in last_message_content
                 ):
                     await last_message.edit(content=final_message)
                 else:

@@ -167,7 +167,7 @@ def process_work_items_for_sprint(
                         "task_type": task.fields["System.WorkItemType"],
                         "task_state": task.fields["System.State"],
                         "task_title": task_title,
-                        "task_effort": task_effort
+                        "task_effort": task_effort,
                     }
                     work_item_dict["tasks"].append(task_dict)
 

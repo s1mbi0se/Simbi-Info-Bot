@@ -39,13 +39,14 @@ class Config(metaclass=SingletonMeta):
     BIRTHDAY_CARGOS = BIRTHDAY_CARGOS.split(",") if BIRTHDAY_CARGOS else None
 
     # MERCADO TOPOGRAFICO ALLERTS
-    MT_ALERTS_CHANNEL =  int(getenv("MT_ALERTS_CHANNEL", default=0))
-    MT_ALERTS_CARGOS =  getenv("MT_ALERTS_CARGO_LIST", default=None)
-    MT_ALERTS_CARGOS = MT_ALERTS_CARGOS.split(",") if MT_ALERTS_CARGOS else None
+    MT_ALERTS_CHANNEL = int(getenv("MT_ALERTS_CHANNEL", default=0))
+    MT_ALERTS_CARGOS = getenv("MT_ALERTS_CARGO_LIST", default=None)
+    MT_ALERTS_CARGOS = (
+        MT_ALERTS_CARGOS.split(",") if MT_ALERTS_CARGOS else None
+    )
 
     MT_URL_PROD = getenv("MT_URL_PROD", default="")
     MT_URL_HOMO = getenv("MT_URL_HOMO", default="")
-
 
     # Google Service Account Access Credentials
     CREDENTIALS: dict = {
