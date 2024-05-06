@@ -94,6 +94,7 @@ class Status(commands.Cog):
                     title in last_message_content
                     and "❌" not in last_message_content
                     and "💀" not in last_message_content
+                    and "🕔" not in last_message_content
                 ):
                     await last_message.edit(content=final_message)
                 else:
