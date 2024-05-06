@@ -15,6 +15,10 @@ def ping_notify(url: str) -> str:
     except httpx.ConnectError:
         return "OFF"
 
+    except httpx.TimeoutException as e:
+        write_error_log(sender=f"SERVICE -> {url}", msg=str(e))
+        return "TIMEOUT"
+
     except Exception as e:
         write_error_log(sender=f"SERVICE -> {url}", msg=str(e))
         return "INTERNAL ERROR"
@@ -26,5 +30,7 @@ def generate_message(name: str, status: str):
             return f"   ✅ {name}" + "\n"
         case "OFF":
             return f"   ❌ {name}" + "\n"
+        case "TIMEOUT":
+            return f"   🕔 {name}: TIMEOUT" + "\n"
         case _:
             return f"   💀 {name}: ERRO INTERNO - VERIFICAR LOG" + "\n"
