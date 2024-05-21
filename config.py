@@ -24,4 +24,4 @@ class Config(metaclass=SingletonMeta):
     TOKEN: str = getenv("TOKEN", default=None)
     SUPABASE_URL: str = getenv("SUPABASE_URL")
     SUPABASE_KEY: str = getenv("SUPABASE_KEY")
-    FRONT_BASE_URL: str = getenv("FRONT_BASE_URL", "https://mngt-vercel.com")
+    FRONT_BASE_URL: str = getenv("FRONT_BASE_URL", "https://mngt-vercel.com/")
