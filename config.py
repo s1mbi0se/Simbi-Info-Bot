@@ -1,5 +1,7 @@
 from os import getenv
 
+import pytz
+
 
 class SingletonMeta(type):
     """
@@ -25,3 +27,4 @@ class Config(metaclass=SingletonMeta):
     SUPABASE_URL: str = getenv("SUPABASE_URL")
     SUPABASE_KEY: str = getenv("SUPABASE_KEY")
     FRONT_BASE_URL: str = getenv("FRONT_BASE_URL", "https://mngt-vercel.com/")
+    TIME_ZONE = pytz.timezone("America/Sao_Paulo")
