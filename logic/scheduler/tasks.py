@@ -29,17 +29,15 @@ class SchedulerTasks(commands.Cog):
         print("SchedulerTasks is ready")
 
         @schedule.task(daily.at("08:00"), name="Generate tasks link")
-        async def verify_sheet():
+        async def send_tasks_link():
             try:
                 for guild in self.bot.guilds:
                     for member in guild.members:
                         message = MESSAGE_WITH_LINK.replace("{{URL}}", Config.FRONT_BASE_URL + str(member.id)) \
                             .replace("{{USER}}", member.global_name)
-                        if str(member.id) == "319539905514569728":
-                            await member.send(message)
+                        await member.send(message)
             except Exception as e:
                 print(e)
-
         await schedule.serve()
 
 

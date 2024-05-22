@@ -27,6 +27,7 @@ class Tasks(commands.Cog):
                 return
             SupabaseClient.create_task(task=arg, created_by_id=ctx.author.id, created_by_name=ctx.author.global_name,
                                        created_to_id=ctx.author.id, created_to_name=ctx.author.global_name)
+            await ctx.channel.send("Lembrete criado com sucesso!")
         else:
             mentions = ctx.message.mentions if ctx.message.mentions else []
             if len(commands) == 2 and "mostrar" in commands[0]:
@@ -37,6 +38,7 @@ class Tasks(commands.Cog):
             SupabaseClient.create_task(task=" ".join(commands[len(mentions):]),
                                        created_by_id=ctx.author.id, created_by_name=ctx.author.global_name,
                                        created_to_id=mentions[0].id, created_to_name=mentions[0].global_name)
+            await ctx.channel.send("Lembrete criado com sucesso!")
 
     @commands.Cog.listener()
     async def on_ready(self):
