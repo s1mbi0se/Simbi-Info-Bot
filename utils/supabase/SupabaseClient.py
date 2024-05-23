@@ -16,7 +16,7 @@ class SupabaseClient:
             "created_to_name": created_to_name,
             "active": True
         }
-        data, count = SUPABASE_CLIENT.table(table_name).insert(task_data).execute()
-        return len(data[1]) > 0
+        result = SUPABASE_CLIENT.table(table_name).insert(task_data).execute()
+        return len(result.data) > 0
 
 

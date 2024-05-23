@@ -1,6 +1,0 @@
-discord
-supabase
-supabase-py
-discord.py
-rocketry
-pytz

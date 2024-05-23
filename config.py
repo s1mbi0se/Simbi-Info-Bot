@@ -1,4 +1,5 @@
 from os import getenv
+from dotenv import load_dotenv
 
 import pytz
 
@@ -21,7 +22,7 @@ class Config(metaclass=SingletonMeta):
     """
     Loading .env file and other configs to be able to get it in all project.
     """
-
+    load_dotenv()
     # Discord Bot Token
     TOKEN: str = getenv("TOKEN", default=None)
     SUPABASE_URL: str = getenv("SUPABASE_URL")
