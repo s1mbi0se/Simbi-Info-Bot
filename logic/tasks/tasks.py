@@ -21,7 +21,7 @@ class Tasks(commands.Cog):
         commands = arg.split(' ')
         if is_private_message:
             if len(commands) == 1 and "mostrar" == commands[0]:
-                message = MESSAGE_WITH_LINK.replace("{{URL}}", Config.FRONT_BASE_URL + str(ctx.author.id))\
+                message = MESSAGE_WITH_LINK.replace("{{URL}}", Config.FRONT_TASK_PERSONAL_URL + str(ctx.author.id))\
                     .replace("{{USER}}", ctx.author.global_name)
                 await ctx.channel.send(message)
                 return
@@ -31,7 +31,7 @@ class Tasks(commands.Cog):
         else:
             mentions = ctx.message.mentions if ctx.message.mentions else []
             if len(commands) == 2 and "mostrar" in commands[0]:
-                message = MESSAGE_WITH_LINK.replace("{{URL}}", Config.FRONT_BASE_URL + str(mentions[0].id))\
+                message = MESSAGE_WITH_LINK.replace("{{URL}}", Config.FRONT_TASK_OTHER_URL + str(mentions[0].id))\
                     .replace("{{USER}}", mentions[0].global_name)
                 await ctx.channel.send(message)
                 return

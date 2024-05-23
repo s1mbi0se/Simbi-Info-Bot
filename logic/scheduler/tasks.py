@@ -33,7 +33,8 @@ class SchedulerTasks(commands.Cog):
             try:
                 for guild in self.bot.guilds:
                     for member in guild.members:
-                        message = MESSAGE_WITH_LINK.replace("{{URL}}", Config.FRONT_BASE_URL + str(member.id)) \
+                        message = MESSAGE_WITH_LINK\
+                            .replace("{{URL}}", Config.FRONT_TASK_PERSONAL_URL + str(member.id)) \
                             .replace("{{USER}}", member.global_name)
                         await member.send(message)
             except Exception as e:

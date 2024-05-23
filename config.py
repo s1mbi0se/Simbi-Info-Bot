@@ -27,5 +27,7 @@ class Config(metaclass=SingletonMeta):
     TOKEN: str = getenv("TOKEN", default=None)
     SUPABASE_URL: str = getenv("SUPABASE_URL")
     SUPABASE_KEY: str = getenv("SUPABASE_KEY")
-    FRONT_BASE_URL: str = getenv("FRONT_BASE_URL", "https://mngt-vercel.com/")
+    FRONT_BASE_URL: str = getenv("FRONT_BASE_URL", "https://mngt-vercel.com")
+    FRONT_TASK_PERSONAL_URL: str = f"{FRONT_BASE_URL}/tasks/personal/?"
+    FRONT_TASK_OTHER_URL: str = f"{FRONT_BASE_URL}/tasks/others/?"
     TIME_ZONE = pytz.timezone("America/Sao_Paulo")
