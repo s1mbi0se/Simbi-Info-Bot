@@ -79,9 +79,14 @@ def process_work_items_for_sprint(
     effort_estimated_list = []
     effort_delivered_list = []
 
+    state_text = {
+        "In Progress": " (em andamento)",
+        "Waiting": " (aguardando)"
+    }
+
     if is_current_sprint:
         state_condition = "!= 'New'"
-        state_condition_task = "IN ('Done', 'In Progress')"
+        state_condition_task = "IN ('Done', 'In Progress', 'Waiting')"
         sprint_list = azure_object["work_items"]
     else:
         state_condition = "!= 'Done'"
@@ -117,6 +122,8 @@ def process_work_items_for_sprint(
             work_item_effort = int(
                 work_item.fields.get("Microsoft.VSTS.Scheduling.Effort", 0)
             )
+
+            effort_estimated_list.append(work_item_effort)
 
             work_item_dict = {
                 "id": work_item.id,
@@ -155,17 +162,20 @@ def process_work_items_for_sprint(
 
                     if task.fields["System.State"] == "Done":
                         effort_delivered_list.append(task_effort)
-                    else:
-                        effort_estimated_list.append(task_effort)
 
                     task_title = task.fields["System.Title"]
-                    if task.fields["System.State"] == "In Progress":
-                        task_title += " (em andamento)"
+                    task_state = task.fields["System.State"]
+
+                    if task_state in state_text:
+                        task_title += state_text[task_state]
+
+                    if task.fields["System.WorkItemType"] == "Impediment":
+                        task_title += " | Impedimento"
 
                     task_dict = {
                         "task_id": task.id,
                         "task_type": task.fields["System.WorkItemType"],
-                        "task_state": task.fields["System.State"],
+                        "task_state": task_state,
                         "task_title": task_title,
                         "task_effort": task_effort,
                     }
@@ -174,13 +184,8 @@ def process_work_items_for_sprint(
             sprint_list.append(work_item_dict)
 
     if is_current_sprint:
-        total_effort_delivered = sum(effort_delivered_list)
-        azure_object["effort"]["delivered"] = total_effort_delivered
-    else:
-        total_effort_estimated = (
-            sum(effort_estimated_list) + azure_object["effort"]["delivered"]
-        )
-        azure_object["effort"]["estimated"] = total_effort_estimated
+        azure_object["effort"]["estimated"] = sum(effort_estimated_list)
+        azure_object["effort"]["delivered"] = sum(effort_delivered_list)
 
 
 if __name__ == "__main__":
