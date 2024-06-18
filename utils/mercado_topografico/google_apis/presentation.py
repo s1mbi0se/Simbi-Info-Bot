@@ -82,12 +82,14 @@ def generate_presentation():
         ]["objectId"]
 
         items_per_slide = 3
+        items_per_slide_next_sprint = 6
 
         print(emoji.emojize(":blue_circle: Gerando slides com work items"))
         generate_slides_with_work_items(
             slide_service,
             presentation_copy_id,
             items_per_slide,
+            items_per_slide_next_sprint,
             azure_object,
             item_slide_original_id,
             next_sprint_item_slide_id,
@@ -103,7 +105,9 @@ def generate_presentation():
 
         print(emoji.emojize(":fire: Limpando variáveis não usadas"))
         clear_unused_variables_globally(
-            slide_service, presentation_copy_id, items_per_slide
+            slide_service,
+            presentation_copy_id,
+            max_ids_in_presentation=items_per_slide_next_sprint,
         )
 
         print(
@@ -111,10 +115,11 @@ def generate_presentation():
         )
 
         current_sprint = azure_object["sprint"]
+        tasks_without_estimates = azure_object["tasks_without_estimates"]
         presentation_url = (
             f"https://docs.google.com/presentation/d/{presentation_copy_id}"
         )
-        return current_sprint, presentation_url
+        return current_sprint, tasks_without_estimates, presentation_url
 
     except HttpError as err:
         print(err)
@@ -124,6 +129,7 @@ def generate_slides_with_work_items(
     slide_service,
     presentation_copy_id: str,
     items_per_slide: int,
+    items_per_slide_next_sprint: int,
     azure_object,
     item_slide_original_id: str,
     next_sprint_item_slide_id: str,
@@ -139,21 +145,40 @@ def generate_slides_with_work_items(
         ]
     ):
         total_list_items = len(items_list)
-        for index in range(total_list_items):
-            # Cria um novo slide a cada 3 work items
-            if index % items_per_slide == 0:
-                number_of_slides_created.append(index)
-                item_slide_copy_id = create_copy_of_item_slide_original(
-                    slide_service, presentation_copy_id, initial_slide_id
+        current_sprint = 0
+        if iteration_index == current_sprint:
+            for index in range(total_list_items):
+                # Cria um novo slide a cada 3 work items
+                if index % items_per_slide == 0:
+                    number_of_slides_created.append(index)
+                    item_slide_copy_id = create_copy_of_item_slide_original(
+                        slide_service, presentation_copy_id, initial_slide_id
+                    )
+                # Altera os valores de uma coluna do slide por vez
+                replace_text_in_each_column_of_the_item_slide_copy(
+                    slide_service,
+                    presentation_copy_id,
+                    item_slide_copy_id,
+                    index,
+                    items_list[index],
                 )
-            # Altera os valores de uma coluna do slide por vez
-            replace_text_in_each_column_of_the_item_slide_copy(
-                slide_service,
-                presentation_copy_id,
-                item_slide_copy_id,
-                index,
-                items_list[index],
-            )
+        else:
+            for index in range(total_list_items):
+                # Novo slide a cada 6 work items para a próxima sprint
+                if index % items_per_slide_next_sprint == 0:
+                    number_of_slides_created.append(index)
+                    item_slide_copy_id = create_copy_of_item_slide_original(
+                        slide_service, presentation_copy_id, initial_slide_id
+                    )
+                # Altera os valores de uma coluna do slide por vez
+                replace_text_in_each_column_next_sprint(
+                    slide_service,
+                    presentation_copy_id,
+                    item_slide_copy_id,
+                    index,
+                    items_list[index],
+                )
+
     print(
         emoji.emojize(
             f"  :check_mark_button: {len(number_of_slides_created)} "
@@ -234,7 +259,6 @@ def replace_text_in_each_column_of_the_item_slide_copy(
     index: int,
     azure_work_items,
 ):
-
     tasks_text = ""
     for i, task in enumerate(azure_work_items["tasks"]):
         tasks_text += f"{task['task_title']}"
@@ -287,10 +311,57 @@ def replace_text_in_each_column_of_the_item_slide_copy(
     )
 
 
-def clear_unused_variables_globally(
-    slide_service, presentation_id, items_per_slide
+def replace_text_in_each_column_next_sprint(
+    slide_service,
+    presentation_id: str,
+    slide_id: int,
+    index: int,
+    azure_work_items,
 ):
-    for index in range(items_per_slide):
+
+    # Intervado de 1 a 6 sempre
+    index_range: str = str(1 + (index % 6))
+
+    body = {
+        "requests": [
+            {
+                "replaceAllText": {
+                    "containsText": {"text": "{{type_" + index_range + "}}"},
+                    "replaceText": azure_work_items["type"],
+                    "pageObjectIds": [slide_id],
+                }
+            },
+            {
+                "replaceAllText": {
+                    "containsText": {"text": "{{id_" + index_range + "}}"},
+                    "replaceText": str(azure_work_items["id"]),
+                    "pageObjectIds": [slide_id],
+                }
+            },
+            {
+                "replaceAllText": {
+                    "containsText": {"text": "{{title_" + index_range + "}}"},
+                    "replaceText": azure_work_items["title"],
+                    "pageObjectIds": [slide_id],
+                }
+            },
+        ]
+    }
+    slide_service.presentations().batchUpdate(
+        presentationId=presentation_id, body=body
+    ).execute()
+    print(
+        emoji.emojize(
+            f"      :check_mark_button:"
+            f" Texto adicionado na Coluna {index_range} do Slide id {slide_id}"
+        )
+    )
+
+
+def clear_unused_variables_globally(
+    slide_service, presentation_id, max_ids_in_presentation
+):
+    for index in range(max_ids_in_presentation):
         index_range: str = str(index + 1)
         body = {
             "requests": [
