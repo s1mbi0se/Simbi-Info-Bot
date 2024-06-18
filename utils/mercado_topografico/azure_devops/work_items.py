@@ -213,8 +213,8 @@ def get_tasks_without_estimates(tasks_without_estimates):
             )
     else:
         message += (
-            f"**Todas as tarefas concluídas foram estimadas** "
-            f":ballot_box_with_check:"
+            "**Todas as tarefas concluídas foram estimadas** "
+            ":ballot_box_with_check:"
         )
 
     return message
