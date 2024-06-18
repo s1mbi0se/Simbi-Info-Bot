@@ -105,7 +105,9 @@ def generate_presentation():
 
         print(emoji.emojize(":fire: Limpando variáveis não usadas"))
         clear_unused_variables_globally(
-            slide_service, presentation_copy_id, max_ids_in_presentation=items_per_slide_next_sprint
+            slide_service,
+            presentation_copy_id,
+            max_ids_in_presentation=items_per_slide_next_sprint,
         )
 
         print(
@@ -124,23 +126,23 @@ def generate_presentation():
 
 
 def generate_slides_with_work_items(
-        slide_service,
-        presentation_copy_id: str,
-        items_per_slide: int,
-        items_per_slide_next_sprint: int,
-        azure_object,
-        item_slide_original_id: str,
-        next_sprint_item_slide_id: str,
+    slide_service,
+    presentation_copy_id: str,
+    items_per_slide: int,
+    items_per_slide_next_sprint: int,
+    azure_object,
+    item_slide_original_id: str,
+    next_sprint_item_slide_id: str,
 ):
     number_of_slides_created = []
     item_slide_copy_id = ""
 
     # Iteração em work items da sprint atual e da próxima
     for iteration_index, (items_list, initial_slide_id) in enumerate(
-            [
-                (azure_object["work_items"], item_slide_original_id),
-                (azure_object["next_sprint"], next_sprint_item_slide_id),
-            ]
+        [
+            (azure_object["work_items"], item_slide_original_id),
+            (azure_object["next_sprint"], next_sprint_item_slide_id),
+        ]
     ):
         total_list_items = len(items_list)
         current_sprint = 0
@@ -186,7 +188,7 @@ def generate_slides_with_work_items(
 
 
 def create_copy_of_presentation(
-        drive_service, slide_template_id: str, azure_object
+    drive_service, slide_template_id: str, azure_object
 ):
     project_name = os.getenv("PROJECT_NAME")
     body = {"name": f"{project_name} - Sprint {azure_object['sprint']}"}
@@ -206,7 +208,7 @@ def create_copy_of_presentation(
 
 
 def create_copy_of_item_slide_original(
-        slide_service, presentation_id: str, item_slide_original_id: str
+    slide_service, presentation_id: str, item_slide_original_id: str
 ):
     body = {
         "requests": [{"duplicateObject": {"objectId": item_slide_original_id}}]
@@ -227,7 +229,7 @@ def create_copy_of_item_slide_original(
 
 
 def replace_text_globally(
-        slide_service, presentation_id: str, old_text: str, new_text: str
+    slide_service, presentation_id: str, old_text: str, new_text: str
 ):
     body = {
         "requests": [
@@ -251,11 +253,11 @@ def replace_text_globally(
 
 
 def replace_text_in_each_column_of_the_item_slide_copy(
-        slide_service,
-        presentation_id: str,
-        slide_id: int,
-        index: int,
-        azure_work_items,
+    slide_service,
+    presentation_id: str,
+    slide_id: int,
+    index: int,
+    azure_work_items,
 ):
     tasks_text = ""
     for i, task in enumerate(azure_work_items["tasks"]):
@@ -310,11 +312,11 @@ def replace_text_in_each_column_of_the_item_slide_copy(
 
 
 def replace_text_in_each_column_next_sprint(
-        slide_service,
-        presentation_id: str,
-        slide_id: int,
-        index: int,
-        azure_work_items,
+    slide_service,
+    presentation_id: str,
+    slide_id: int,
+    index: int,
+    azure_work_items,
 ):
 
     # Intervado de 1 a 6 sempre
@@ -342,7 +344,7 @@ def replace_text_in_each_column_next_sprint(
                     "replaceText": azure_work_items["title"],
                     "pageObjectIds": [slide_id],
                 }
-            }
+            },
         ]
     }
     slide_service.presentations().batchUpdate(
@@ -357,7 +359,7 @@ def replace_text_in_each_column_next_sprint(
 
 
 def clear_unused_variables_globally(
-        slide_service, presentation_id, max_ids_in_presentation
+    slide_service, presentation_id, max_ids_in_presentation
 ):
     for index in range(max_ids_in_presentation):
         index_range: str = str(index + 1)

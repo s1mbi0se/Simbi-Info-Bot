@@ -47,7 +47,7 @@ def get_azure_object(
         "effort": effort_dict,
         "work_items": [],
         "next_sprint": [],
-        "tasks_without_estimates": []
+        "tasks_without_estimates": [],
     }
 
     print(emoji.emojize(":blue_circle: Obtendo work items da sprint atual"))
@@ -80,10 +80,7 @@ def process_work_items_for_sprint(
     effort_estimated_list = []
     effort_delivered_list = []
 
-    state_text = {
-        "In Progress": " (em andamento)",
-        "Waiting": " (aguardando)"
-    }
+    state_text = {"In Progress": " (em andamento)", "Waiting": " (aguardando)"}
 
     if is_current_sprint:
         state_condition = "!= 'New'"
@@ -132,7 +129,9 @@ def process_work_items_for_sprint(
                 "state": work_item.fields["System.State"],
                 "title": work_item.fields["System.Title"],
                 "effort": work_item_effort,
-                "assigned_to": work_item.fields["System.AssignedTo"]["displayName"],
+                "assigned_to": work_item.fields["System.AssignedTo"][
+                    "displayName"
+                ],
                 "tasks": [],
             }
 
@@ -180,12 +179,20 @@ def process_work_items_for_sprint(
                         "task_state": task_state,
                         "task_title": task_title,
                         "task_effort": task_effort,
-                        "task_assigned_to": work_item.fields["System.AssignedTo"]["displayName"],
+                        "task_assigned_to": work_item.fields[
+                            "System.AssignedTo"
+                        ]["displayName"],
                     }
                     work_item_dict["tasks"].append(task_dict)
 
-                    if is_current_sprint and task_effort == 0 and task_state == "Done":
-                        azure_object["tasks_without_estimates"].append(task_dict)
+                    if (
+                        is_current_sprint
+                        and task_effort == 0
+                        and task_state == "Done"
+                    ):
+                        azure_object["tasks_without_estimates"].append(
+                            task_dict
+                        )
 
             sprint_list.append(work_item_dict)
 

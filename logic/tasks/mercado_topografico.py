@@ -5,7 +5,9 @@ from discord.utils import get
 from dotenv import load_dotenv
 
 from utils.mercado_topografico.azure_devops.estimate import estimated_efforts
-from utils.mercado_topografico.azure_devops.work_items import get_tasks_without_estimates
+from utils.mercado_topografico.azure_devops.work_items import (
+    get_tasks_without_estimates,
+)
 from utils.mercado_topografico.google_apis.presentation import (
     generate_presentation,
 )
@@ -45,8 +47,12 @@ class MercadoTopografico(commands.Cog):
         await message.channel.send(
             "Um momento, estou preparando a apresentação..."
         )
-        current_sprint, tasks_without_estimates, presentation_url = generate_presentation()
-        message_tasks_without_estimates = get_tasks_without_estimates(tasks_without_estimates)
+        current_sprint, tasks_without_estimates, presentation_url = (
+            generate_presentation()
+        )
+        message_tasks_without_estimates = get_tasks_without_estimates(
+            tasks_without_estimates
+        )
         mt_role_name = os.getenv("MT_ROLE_NAME")
         role = get(message.guild.roles, name=mt_role_name)
         await message.channel.send(
