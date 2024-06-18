@@ -164,7 +164,7 @@ def generate_slides_with_work_items(
                 )
         else:
             for index in range(total_list_items):
-                # Cria um novo slide a cada 6 work items para a seção de próxima sprint
+                # Novo slide a cada 6 work items para a próxima sprint
                 if index % items_per_slide_next_sprint == 0:
                     number_of_slides_created.append(index)
                     item_slide_copy_id = create_copy_of_item_slide_original(
