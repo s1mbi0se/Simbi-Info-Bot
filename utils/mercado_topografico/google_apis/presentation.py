@@ -113,10 +113,11 @@ def generate_presentation():
         )
 
         current_sprint = azure_object["sprint"]
+        tasks_without_estimates = azure_object["tasks_without_estimates"]
         presentation_url = (
             f"https://docs.google.com/presentation/d/{presentation_copy_id}"
         )
-        return current_sprint, presentation_url
+        return current_sprint, tasks_without_estimates, presentation_url
 
     except HttpError as err:
         print(err)

@@ -47,6 +47,7 @@ def get_azure_object(
         "effort": effort_dict,
         "work_items": [],
         "next_sprint": [],
+        "tasks_without_estimates": []
     }
 
     print(emoji.emojize(":blue_circle: Obtendo work items da sprint atual"))
@@ -131,6 +132,7 @@ def process_work_items_for_sprint(
                 "state": work_item.fields["System.State"],
                 "title": work_item.fields["System.Title"],
                 "effort": work_item_effort,
+                "assigned_to": work_item.fields["System.AssignedTo"]["displayName"],
                 "tasks": [],
             }
 
@@ -178,14 +180,30 @@ def process_work_items_for_sprint(
                         "task_state": task_state,
                         "task_title": task_title,
                         "task_effort": task_effort,
+                        "task_assigned_to": work_item.fields["System.AssignedTo"]["displayName"],
                     }
                     work_item_dict["tasks"].append(task_dict)
+
+                    if is_current_sprint and task_effort == 0 and task_state == "Done":
+                        azure_object["tasks_without_estimates"].append(task_dict)
 
             sprint_list.append(work_item_dict)
 
     if is_current_sprint:
         azure_object["effort"]["estimated"] = sum(effort_estimated_list)
         azure_object["effort"]["delivered"] = sum(effort_delivered_list)
+
+
+def get_tasks_without_estimates(tasks_without_estimates):
+    message = ""
+    if len(tasks_without_estimates) > 0:
+        message = "## Atenção, há tarefas concluídas sem estimativa: \n"
+        for task in tasks_without_estimates:
+            message += f":small_orange_diamond: **{task['task_assigned_to']}** - {task['task_id']} {task['task_title']}"
+    else:
+        message += "**Todas as tarefas concluídas foram estimadas** :ballot_box_with_check:"
+
+    return message
 
 
 if __name__ == "__main__":
