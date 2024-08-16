@@ -124,7 +124,9 @@ def process_work_items_for_sprint(
             effort_estimated_list.append(work_item_effort)
 
             assigned_to = work_item.fields.get("System.AssignedTo", {})
-            assigned_to_name = assigned_to.get("displayName", "Sem responsável")
+            assigned_to_name = assigned_to.get(
+                "displayName", "Sem responsável"
+            )
 
             work_item_dict = {
                 "id": work_item.id,
@@ -159,7 +161,9 @@ def process_work_items_for_sprint(
                     )
 
                     task_effort = float(
-                        task.fields.get("Microsoft.VSTS.Scheduling.Effort", 0.0)
+                        task.fields.get(
+                            "Microsoft.VSTS.Scheduling.Effort", 0.0
+                        )
                     )
 
                     if task.fields["System.State"] == "Done":
@@ -175,7 +179,9 @@ def process_work_items_for_sprint(
                         task_title += " | Impedimento"
 
                     assigned_to = work_item.fields.get("System.AssignedTo", {})
-                    assigned_to_name = assigned_to.get("displayName", "Sem responsável")
+                    assigned_to_name = assigned_to.get(
+                        "displayName", "Sem responsável"
+                    )
 
                     task_dict = {
                         "task_id": task.id,

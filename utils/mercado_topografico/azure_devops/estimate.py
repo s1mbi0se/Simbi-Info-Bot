@@ -39,7 +39,9 @@ def estimated_efforts():
     if work_item_list.work_items is not None:
         for item in work_item_list.work_items:
             work_item = work_item_tracking_client.get_work_item(id=item.id)
-            effort = int(work_item.fields.get('Microsoft.VSTS.Scheduling.Effort', 0))
+            effort = int(
+                work_item.fields.get("Microsoft.VSTS.Scheduling.Effort", 0)
+            )
 
             if effort > 0:
                 effort = "10+" if effort > 10 else effort
