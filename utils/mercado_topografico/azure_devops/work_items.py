@@ -117,11 +117,14 @@ def process_work_items_for_sprint(
                 else work_item_type
             )
 
-            work_item_effort = int(
-                work_item.fields.get("Microsoft.VSTS.Scheduling.Effort", 0)
+            work_item_effort = float(
+                work_item.fields.get("Microsoft.VSTS.Scheduling.Effort", 0.0)
             )
 
             effort_estimated_list.append(work_item_effort)
+
+            assigned_to = work_item.fields.get("System.AssignedTo", {})
+            assigned_to_name = assigned_to.get("displayName", "Sem responsável")
 
             work_item_dict = {
                 "id": work_item.id,
@@ -129,9 +132,7 @@ def process_work_items_for_sprint(
                 "state": work_item.fields["System.State"],
                 "title": work_item.fields["System.Title"],
                 "effort": work_item_effort,
-                "assigned_to": work_item.fields["System.AssignedTo"][
-                    "displayName"
-                ],
+                "assigned_to": assigned_to_name,
                 "tasks": [],
             }
 
@@ -157,8 +158,8 @@ def process_work_items_for_sprint(
                         id=task_item.id
                     )
 
-                    task_effort = int(
-                        task.fields.get("Microsoft.VSTS.Scheduling.Effort", 0)
+                    task_effort = float(
+                        task.fields.get("Microsoft.VSTS.Scheduling.Effort", 0.0)
                     )
 
                     if task.fields["System.State"] == "Done":
@@ -173,21 +174,22 @@ def process_work_items_for_sprint(
                     if task.fields["System.WorkItemType"] == "Impediment":
                         task_title += " | Impedimento"
 
+                    assigned_to = work_item.fields.get("System.AssignedTo", {})
+                    assigned_to_name = assigned_to.get("displayName", "Sem responsável")
+
                     task_dict = {
                         "task_id": task.id,
                         "task_type": task.fields["System.WorkItemType"],
                         "task_state": task_state,
                         "task_title": task_title,
                         "task_effort": task_effort,
-                        "task_assigned_to": work_item.fields[
-                            "System.AssignedTo"
-                        ]["displayName"],
+                        "task_assigned_to": assigned_to_name,
                     }
                     work_item_dict["tasks"].append(task_dict)
 
                     if (
                         is_current_sprint
-                        and task_effort == 0
+                        and task_effort == 0.0
                         and task_state == "Done"
                     ):
                         azure_object["tasks_without_estimates"].append(
@@ -209,7 +211,7 @@ def get_tasks_without_estimates(tasks_without_estimates):
             message += (
                 f":small_orange_diamond: **{task['task_assigned_to']}** - "
                 f"{task['task_id']} "
-                f"{task['task_title']}"
+                f"{task['task_title']}\n"
             )
     else:
         message += (
