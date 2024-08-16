@@ -47,9 +47,12 @@ class MercadoTopografico(commands.Cog):
         await message.channel.send(
             "Um momento, estou preparando a apresentação..."
         )
-        current_sprint, tasks_without_estimates, presentation_url, message_tasks = (
-            generate_presentation()
-        )
+        (
+            current_sprint,
+            tasks_without_estimates,
+            presentation_url,
+            message_tasks,
+        ) = generate_presentation()
 
         message_to_send = message_tasks["message"]
         mt_role_name = os.getenv("MT_ROLE_NAME")
@@ -57,8 +60,7 @@ class MercadoTopografico(commands.Cog):
 
         if not message_tasks["all_estimated"]:
             await message.channel.send(
-                f"{message_to_send}\n"
-                f"{role.mention}"
+                f"{message_to_send}\n" f"{role.mention}"
             )
         else:
             await message.channel.send(

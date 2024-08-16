@@ -7,7 +7,8 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 from utils.mercado_topografico.azure_devops.work_items import (
-    get_azure_work_items, get_tasks_without_estimates,
+    get_azure_work_items,
+    get_tasks_without_estimates,
 )
 
 load_dotenv()
@@ -40,14 +41,17 @@ def generate_presentation():
         azure_object = get_azure_work_items()
 
         tasks_without_estimates = azure_object["tasks_without_estimates"]
-        message_tasks = get_tasks_without_estimates(
-            tasks_without_estimates
-        )
+        message_tasks = get_tasks_without_estimates(tasks_without_estimates)
         if not message_tasks["all_estimated"]:
             current_sprint = None
             tasks_without_estimates = None
             presentation_url = None
-            return current_sprint, tasks_without_estimates, presentation_url, message_tasks
+            return (
+                current_sprint,
+                tasks_without_estimates,
+                presentation_url,
+                message_tasks,
+            )
 
         print(
             emoji.emojize(
@@ -129,7 +133,12 @@ def generate_presentation():
         presentation_url = (
             f"https://docs.google.com/presentation/d/{presentation_copy_id}"
         )
-        return current_sprint, tasks_without_estimates, presentation_url, message_tasks
+        return (
+            current_sprint,
+            tasks_without_estimates,
+            presentation_url,
+            message_tasks,
+        )
 
     except HttpError as err:
         print(err)

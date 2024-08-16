@@ -227,10 +227,7 @@ def get_tasks_without_estimates(tasks_without_estimates) -> dict:
             ":ballot_box_with_check:"
         )
 
-    estimates_respose = {
-        "all_estimated": all_estimated,
-        "message": message
-    }
+    estimates_respose = {"all_estimated": all_estimated, "message": message}
     return estimates_respose
 
 
