@@ -209,9 +209,10 @@ def process_work_items_for_sprint(
         azure_object["effort"]["delivered"] = sum(effort_delivered_list)
 
 
-def get_tasks_without_estimates(tasks_without_estimates):
+def get_tasks_without_estimates(tasks_without_estimates) -> dict:
     message = ""
     if len(tasks_without_estimates) > 0:
+        all_estimated = False
         message = "## Atenção, há tarefas concluídas sem estimativa: \n"
         for task in tasks_without_estimates:
             message += (
@@ -220,12 +221,17 @@ def get_tasks_without_estimates(tasks_without_estimates):
                 f"{task['task_title']}\n"
             )
     else:
+        all_estimated = True
         message += (
             "**Todas as tarefas concluídas foram estimadas** "
             ":ballot_box_with_check:"
         )
 
-    return message
+    estimates_respose = {
+        "all_estimated": all_estimated,
+        "message": message
+    }
+    return estimates_respose
 
 
 if __name__ == "__main__":

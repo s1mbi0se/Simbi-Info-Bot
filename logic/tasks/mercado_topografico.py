@@ -47,20 +47,26 @@ class MercadoTopografico(commands.Cog):
         await message.channel.send(
             "Um momento, estou preparando a apresentação..."
         )
-        current_sprint, tasks_without_estimates, presentation_url = (
+        current_sprint, tasks_without_estimates, presentation_url, message_tasks = (
             generate_presentation()
         )
-        message_tasks_without_estimates = get_tasks_without_estimates(
-            tasks_without_estimates
-        )
+
+        message_to_send = message_tasks["message"]
         mt_role_name = os.getenv("MT_ROLE_NAME")
         role = get(message.guild.roles, name=mt_role_name)
-        await message.channel.send(
-            f"{message.author.mention} e {role.mention} aqui está"
-            f" a apresentação da **Sprint Review {current_sprint}**: "
-            f"{presentation_url}\n"
-            f"{message_tasks_without_estimates}"
-        )
+
+        if not message_tasks["all_estimated"]:
+            await message.channel.send(
+                f"{message_to_send}\n"
+                f"{role.mention}"
+            )
+        else:
+            await message.channel.send(
+                f"{message.author.mention} e {role.mention} aqui está"
+                f" a apresentação da **Sprint Review {current_sprint}**:\n"
+                f"{presentation_url}\n"
+                f"{message_to_send}"
+            )
 
     @staticmethod
     async def process_estimate_command(message):
