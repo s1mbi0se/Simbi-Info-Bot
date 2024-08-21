@@ -39,11 +39,16 @@ def estimated_efforts():
     if work_item_list.work_items is not None:
         for item in work_item_list.work_items:
             work_item = work_item_tracking_client.get_work_item(id=item.id)
-
-            friendly_message += (
-                f":small_blue_diamond: {work_item.fields['System.Title']}: "
-                f"**{int(work_item.fields.get('Microsoft.VSTS.Scheduling.Effort', 0))}**\n"  # noqa
+            effort = int(
+                work_item.fields.get("Microsoft.VSTS.Scheduling.Effort", 0)
             )
+
+            if effort > 0:
+                effort = "10+" if effort > 10 else effort
+                friendly_message += (
+                    f":small_blue_diamond: {work_item.fields['System.Title']}: " # noqa
+                    f"**{effort}**\n"
+                )
 
     print(emoji.emojize(":thumbs_up: Estimativas obtidas com sucesso!"))
     return friendly_message
