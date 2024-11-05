@@ -46,7 +46,7 @@ def estimated_efforts():
             if effort > 0:
                 effort = "10+" if effort > 10 else effort
                 friendly_message += (
-                    f":small_blue_diamond: {work_item.fields['System.Title']}: " # noqa
+                    f":small_blue_diamond: {work_item.fields['System.Title']}: "  # noqa
                     f"**{effort}**\n"
                 )
 
