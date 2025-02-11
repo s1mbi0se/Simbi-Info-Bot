@@ -9,7 +9,7 @@ from rocketry.conditions.api import daily
 
 from utils.birthday import get_birthdays
 from utils.get_time import get_time_from_api
-from utils.logging import write_error_log, write_report_log
+from utils.logging import write_error_log_async, write_report_log_async
 
 schedule = Rocketry(
     config={
@@ -37,12 +37,14 @@ class Birth(commands.Cog):
 
             print(f"SEARCHING BIRTH: {now.date()} - {now.time()}")
 
-            write_report_log(sender="BIRTH", msg="Starting daily birth check")
+            await write_report_log_async(
+                sender="BIRTH", msg="Starting daily birth check", now=now
+            )
 
             try:
                 channel = self.bot.get_channel(Config.BIRTHDAY_CHANNEL)
-
-                LIST_OF_MEMBERS = get_birthdays()
+                print(f"GET MEMBERS LIST: {now.date()} - {now.time()}")
+                LIST_OF_MEMBERS = get_birthdays(today=now.date())
 
                 discord_files = []
                 if LIST_OF_MEMBERS:
@@ -104,7 +106,7 @@ class Birth(commands.Cog):
                 else:
                     return
             except Exception as e:
-                write_error_log(sender="BIRTH", msg=str(e))
+                await write_error_log_async(sender="BIRTH", msg=str(e))
 
         await schedule.serve()
 

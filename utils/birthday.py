@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 
 import gspread
 from config import Config
@@ -16,8 +16,8 @@ def get_cloud_storage_client():
     return client
 
 
-def get_birthdays():
-    TODAY = get_time_from_api().date()
+def get_birthdays(today: date = None):
+    TODAY = today if today else get_time_from_api().date()
 
     # TODAY = datetime.strptime(
     #     '2024-01-05T17:17:46.583955-03:00', "%Y-%m-%dT%H:%M:%S.%f%z"
