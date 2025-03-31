@@ -34,6 +34,17 @@ class Birth(commands.Cog):
         @schedule.task(daily.at("08:00"), name="Verify birthdays")
         async def verify_sheet():
             now = get_time_from_api()
+            await write_report_log_async(
+                sender="BIRTH",
+                msg="Iniciando verificação de aniversários",
+                now=now,
+            )
+
+            await write_report_log_async(
+                sender="BIRTH",
+                msg=f"Data atual obtida: {now.date()} - {now.time()}",
+                now=now,
+            )
 
             print(f"SEARCHING BIRTH: {now.date()} - {now.time()}")
 
@@ -43,11 +54,24 @@ class Birth(commands.Cog):
 
             try:
                 channel = self.bot.get_channel(Config.BIRTHDAY_CHANNEL)
+                if not channel:
+                    await write_error_log_async(
+                        sender="BIRTH",
+                        msg="Canal de aniversário não encontrado",
+                        now=now,
+                    )
+                    return
                 print(f"GET MEMBERS LIST: {now.date()} - {now.time()}")
                 LIST_OF_MEMBERS = get_birthdays(today=now.date())
 
-                discord_files = []
+                await write_report_log_async(
+                    sender="BIRTH",
+                    msg=f"{len(LIST_OF_MEMBERS) if LIST_OF_MEMBERS else 0} aniversariantes encontrados",
+                    now=now,
+                )
+
                 if LIST_OF_MEMBERS:
+                    discord_files = []
                     names = ""
                     pix = ""
 
@@ -61,9 +85,24 @@ class Birth(commands.Cog):
                             else ""
                         )
 
+                        await write_report_log_async(
+                            sender="BIRTH",
+                            msg=f"Processando membro: {member['Membro']}",
+                            now=now,
+                        )
+
                         image_request = httpx.get(
                             member.get("Foto"), follow_redirects=True
                         )
+
+                        if image_request.status_code != 200:
+                            await write_error_log_async(
+                                sender="BIRTH",
+                                msg=f"Falha ao baixar foto de {member['Membro']}: Status {image_request.status_code}",
+                                now=now,
+                            )
+                            continue
+
                         image_bytes = BytesIO(image_request.content)
 
                         discord_file = File(
@@ -93,6 +132,11 @@ class Birth(commands.Cog):
                         else None
                     )
 
+                    await write_report_log_async(
+                        sender="BIRTH",
+                        msg="Enviando mensagem ao canal",
+                        now=now,
+                    )
                     await channel.send(
                         f"{cargo_mentions if cargo_mentions else ''}"
                         f"**HOJE É DIA DE  COMEMORAR!**\n\n"
@@ -103,10 +147,21 @@ class Birth(commands.Cog):
                         f"{pix}",
                         files=discord_files,
                     )
+                    await write_report_log_async(
+                        sender="BIRTH",
+                        msg="Mensagem enviada com sucesso",
+                        now=now,
+                    )
                 else:
-                    return
+                    await write_report_log_async(
+                        sender="BIRTH",
+                        msg="Nenhum aniversariante encontrado hoje",
+                        now=now,
+                    )
             except Exception as e:
-                await write_error_log_async(sender="BIRTH", msg=str(e))
+                await write_error_log_async(
+                    sender="BIRTH", msg=f"Erro na execução: {str(e)}", now=now
+                )
 
         await schedule.serve()
 
