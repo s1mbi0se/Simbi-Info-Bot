@@ -33,24 +33,11 @@ class Birth(commands.Cog):
 
         @schedule.task(daily.at("08:00"), name="Verify birthdays")
         async def verify_sheet():
+            await write_report_log_async(
+                sender="BIRTH", msg="Iniciando verificação de aniversários"
+            )
+
             now = get_time_from_api()
-            await write_report_log_async(
-                sender="BIRTH",
-                msg="Iniciando verificação de aniversários",
-                now=now,
-            )
-
-            await write_report_log_async(
-                sender="BIRTH",
-                msg=f"Data atual obtida: {now.date()} - {now.time()}",
-                now=now,
-            )
-
-            print(f"SEARCHING BIRTH: {now.date()} - {now.time()}")
-
-            await write_report_log_async(
-                sender="BIRTH", msg="Starting daily birth check", now=now
-            )
 
             try:
                 channel = self.bot.get_channel(Config.BIRTHDAY_CHANNEL)
