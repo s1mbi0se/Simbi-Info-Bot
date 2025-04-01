@@ -28,9 +28,7 @@ class Status(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        await write_report_log_async(
-            sender="MT - VERIFY", msg="STATUS - OK"
-        )
+        await write_report_log_async(sender="MT - VERIFY", msg="STATUS - OK")
         print("Status Verify is ready")
 
         @schedule_status.task(every("20m"), name="Verify status MT")

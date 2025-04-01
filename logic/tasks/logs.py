@@ -56,9 +56,8 @@ class Logs(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        await write_report_log_async(
-            sender="LOGS", msg="STATUS - OK"
-        )
+        await write_report_log_async(sender="LOGS", msg="STATUS - OK")
+
 
 async def setup(bot):
     await bot.add_cog(Logs(bot))

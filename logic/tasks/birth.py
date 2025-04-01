@@ -30,9 +30,7 @@ class Birth(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         print("Birth is ready")
-        await write_report_log_async(
-            sender="BIRTH", msg="STATUS - OK"
-        )
+        await write_report_log_async(sender="BIRTH", msg="STATUS - OK")
 
         @schedule.task(daily.at("08:00"), name="Verify birthdays")
         async def verify_sheet():
