@@ -4,6 +4,7 @@ from discord.ext import commands
 from discord.utils import get
 from dotenv import load_dotenv
 
+from utils.logging import write_report_log_async
 from utils.mercado_topografico.azure_devops.estimate import estimated_efforts
 from utils.mercado_topografico.google_apis.presentation import (
     generate_presentation,
@@ -88,6 +89,9 @@ class MercadoTopografico(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
+        await write_report_log_async(
+            sender="MT-PRESENTATION", msg="STATUS - OK"
+        )
         print("Presentation is ready")
 
 

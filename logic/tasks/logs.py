@@ -3,6 +3,8 @@ import os
 import discord
 from discord.ext import commands
 
+from utils.logging import write_report_log_async
+
 
 class Logs(commands.Cog):
     """
@@ -54,8 +56,9 @@ class Logs(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        print("Logs is ready")
-
+        await write_report_log_async(
+            sender="LOGS", msg="STATUS - OK"
+        )
 
 async def setup(bot):
     await bot.add_cog(Logs(bot))

@@ -4,6 +4,7 @@ from rocketry import Rocketry
 from rocketry.conditions.api import every
 
 from utils.get_time import get_time_from_api
+from utils.logging import write_report_log_async
 from utils.mercado_topografico.status_verify.utils_status_mt import (
     generate_message,
     ping_notify,
@@ -27,6 +28,9 @@ class Status(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
+        await write_report_log_async(
+            sender="MT - VERIFY", msg="STATUS - OK"
+        )
         print("Status Verify is ready")
 
         @schedule_status.task(every("20m"), name="Verify status MT")
