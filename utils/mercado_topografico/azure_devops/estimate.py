@@ -36,6 +36,8 @@ def estimated_efforts():
         f" {mercado_topografico.current_sprint_number}**:\n\n"
     )
 
+    sprint_effort = 0
+
     if work_item_list.work_items is not None:
         for item in work_item_list.work_items:
             work_item = work_item_tracking_client.get_work_item(id=item.id)
@@ -44,11 +46,14 @@ def estimated_efforts():
             )
 
             if effort > 0:
+                sprint_effort += effort
                 effort = "10+" if effort > 10 else effort
                 friendly_message += (
                     f":small_blue_diamond: {work_item.fields['System.Title']}: "  # noqa
                     f"**{effort}**\n"
                 )
+
+    friendly_message += f"\n\nTotal de pontos na sprint: **{sprint_effort}**"
 
     print(emoji.emojize(":thumbs_up: Estimativas obtidas com sucesso!"))
     return friendly_message

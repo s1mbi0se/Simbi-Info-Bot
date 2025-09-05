@@ -1,3 +1,28 @@
+[project]
+name = "bot-simbi-info"
+version = "0.1.0"
+description = "Bot Simbi Info"
+requires-python = ">=3.10"
+dependencies = [
+    "python-dotenv",
+    "discord.py",
+    "gspread",
+    "pytz",
+    "isort",
+    "black",
+    "flake8",
+    "pyproject-flake8",
+    "gdown",
+    "httpx",
+    "emoji",
+    "google-api-python-client",
+    "google-auth-httplib2",
+    "google-auth-oauthlib",
+    "azure-devops",
+    "rocketry",
+    "pydantic==1.10.10",
+]
+
 [tool.flake8]
 exclude = [".venv", "build"]
 max-line-length = 79

@@ -9,6 +9,7 @@ from utils.mercado_topografico.azure_devops.estimate import estimated_efforts
 from utils.mercado_topografico.google_apis.presentation import (
     generate_presentation,
 )
+from utils.mercado_topografico.status_verify.utils_status_mt import ping_notify
 
 load_dotenv()
 
@@ -37,6 +38,8 @@ class MercadoTopografico(commands.Cog):
                 await self.process_presentation_command(message)
             elif "estimate" in message.content:
                 await self.process_estimate_command(message)
+            elif "verify" in message.content:
+                await self.process_verify_command(message)
             else:
                 await self.send_invalid_command_message(message)
 
@@ -79,12 +82,38 @@ class MercadoTopografico(commands.Cog):
         )
 
     @staticmethod
+    async def process_verify_command(message):
+        await message.channel.send(
+            "Um momento, vou verificar as instâncias..."
+        )
+
+        instances_url = [
+            "https://mercadotopografico.com.br",
+            "https://www.mercadotopografico.com.br",
+            "https://geomarkett.com",
+            "https://www.geomarkett.com",
+            "https://geomarkett.cl",
+            "https://www.geomarkett.cl",
+            "https://teste.mercadotopografico.com.br",
+            "https://devtest.mercadotopografico.com.br",
+            "https://app.mercadotopografico.com.br",
+        ]
+
+        response = f"\nSTATUS DAS INSTÂNCIAS:\n"
+        for url in instances_url:
+            status = await ping_notify(url)
+            response += f"{status}\n"
+
+        await message.channel.send(f"{message.author.mention} {response}")
+
+    @staticmethod
     async def send_invalid_command_message(message):
         await message.channel.send(
             "### Comando inválido\n"
             "Use um dos comandos abaixo:\n"
             "**!mt-presentation** para gerar a apresentação da sprint review\n"
             "**!mt-estimate** para obter as estimativas da sprint atual"
+            "**!mt-verify** para obter o status das instâncias do Mercado Topografico\n"
         )
 
     @commands.Cog.listener()
