@@ -112,7 +112,7 @@ class MercadoTopografico(commands.Cog):
             "### Comando inválido\n"
             "Use um dos comandos abaixo:\n"
             "**!mt-presentation** para gerar a apresentação da sprint review\n"
-            "**!mt-estimate** para obter as estimativas da sprint atual"
+            "**!mt-estimate** para obter as estimativas da sprint atual\n"
             "**!mt-verify** para obter o status das instâncias do Mercado Topografico\n"
         )
 
