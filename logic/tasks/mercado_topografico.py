@@ -89,6 +89,8 @@ class MercadoTopografico(commands.Cog):
 
         instances_url = [
             "https://mercadotopografico.com.br",
+            "https://prod01.mercadotopografico.com.br",
+            "https://prod02.mercadotopografico.com.br",
             "https://www.mercadotopografico.com.br",
             "https://geomarkett.com",
             "https://www.geomarkett.com",
