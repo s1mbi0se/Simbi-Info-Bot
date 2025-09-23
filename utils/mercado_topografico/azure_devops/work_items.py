@@ -178,8 +178,8 @@ def process_work_items_for_sprint(
                     if task.fields["System.WorkItemType"] == "Impediment":
                         task_title += " | Impedimento"
 
-                    assigned_to = work_item.fields.get("System.AssignedTo", {})
-                    assigned_to_name = assigned_to.get(
+                    task_assigned_to = task.fields.get("System.AssignedTo", {})
+                    task_assigned_to_name = task_assigned_to.get(
                         "displayName", "Sem responsável"
                     )
 
@@ -189,7 +189,7 @@ def process_work_items_for_sprint(
                         "task_state": task_state,
                         "task_title": task_title,
                         "task_effort": task_effort,
-                        "task_assigned_to": assigned_to_name,
+                        "task_assigned_to": task_assigned_to_name,
                     }
                     work_item_dict["tasks"].append(task_dict)
 
