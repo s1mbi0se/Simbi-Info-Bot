@@ -1,0 +1,11 @@
+services:
+  simbi-info:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bot-simbi-info
+    restart: unless-stopped
+    volumes:
+      - ./report.log:/app/report.log
+    env_file:
+      - .env
