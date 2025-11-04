@@ -91,12 +91,10 @@ def process_work_items_for_sprint(
         state_condition_task = "!= 'Done'"
         sprint_list = azure_object["next_sprint"]
 
-    # Consulta para retornar work items e suas tasks
     work_item_query = Wiql(
         query=f"SELECT [System.Id], [System.Title], [System.State] "
         f"FROM WorkItems "
         f"WHERE [System.WorkItemType] IN ('Product Backlog Item', 'Bug') "
-        f"AND [System.State] {state_condition} "
         f"AND [System.IterationPath] = '{current_sprint_path}'"
     )
 
@@ -121,7 +119,15 @@ def process_work_items_for_sprint(
                 work_item.fields.get("Microsoft.VSTS.Scheduling.Effort", 0.0)
             )
 
-            effort_estimated_list.append(work_item_effort)
+            work_item_state = work_item.fields["System.State"]
+
+            if is_current_sprint:
+                effort_estimated_list.append(work_item_effort)
+
+            if is_current_sprint and work_item_state == 'New':
+                continue
+            if not is_current_sprint and work_item_state == 'Done':
+                continue
 
             assigned_to = work_item.fields.get("System.AssignedTo", {})
             assigned_to_name = assigned_to.get(
@@ -131,7 +137,7 @@ def process_work_items_for_sprint(
             work_item_dict = {
                 "id": work_item.id,
                 "type": work_item_type,
-                "state": work_item.fields["System.State"],
+                "state": work_item_state,
                 "title": work_item.fields["System.Title"],
                 "effort": work_item_effort,
                 "assigned_to": assigned_to_name,
@@ -166,7 +172,7 @@ def process_work_items_for_sprint(
                         )
                     )
 
-                    if task.fields["System.State"] == "Done":
+                    if task.fields["System.State"] == "Done" and task_effort > 0:
                         effort_delivered_list.append(task_effort)
 
                     task_title = task.fields["System.Title"]
