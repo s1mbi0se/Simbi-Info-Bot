@@ -42,7 +42,8 @@ class Logs(commands.Cog):
                         f"# {log_file}\n\n"
                         f"{''.join(last_lines)}```"
                     )
-
+        elif message.content.startswith("!birth"):
+            pass
         else:
             help_message = (
                 "```markdown\n"

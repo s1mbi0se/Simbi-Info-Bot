@@ -6,7 +6,7 @@ import httpx
 from config import Config
 from discord import File
 from discord.ext import commands
-from discord.ui import View, Button
+from discord.ui import Button, View
 from rocketry import Rocketry
 from rocketry.conditions.api import daily
 
@@ -29,7 +29,9 @@ class ConfirmView(View):
 
     @discord.ui.button(label="Sim", style=discord.ButtonStyle.green)
     async def confirm(self, interaction: discord.Interaction, button: Button):
-        await interaction.response.send_message("Confirmado! Enviando mensagem...", ephemeral=True)
+        await interaction.response.send_message(
+            "Confirmado! Enviando mensagem...", ephemeral=True
+        )
         self.value = True
         self.stop()
 
@@ -64,7 +66,9 @@ class Birth(commands.Cog):
                     now=now,
                 )
                 if manual and dm_channel:
-                    await dm_channel.send("Erro: Canal de aniversário não encontrado.")
+                    await dm_channel.send(
+                        "Erro: Canal de aniversário não encontrado."
+                    )
                 return
 
             print(f"GET MEMBERS LIST: {now.date()} - {now.time()}")
@@ -83,7 +87,9 @@ class Birth(commands.Cog):
                     now=now,
                 )
                 if manual and dm_channel:
-                    await dm_channel.send("Nenhum aniversariante encontrado hoje.")
+                    await dm_channel.send(
+                        "Nenhum aniversariante encontrado hoje."
+                    )
                 return
 
             image_data_list = []
@@ -101,8 +107,12 @@ class Birth(commands.Cog):
                 )
 
             # Download images with timeout and continue on failure (with retries)
-            timeout = httpx.Timeout(connect=5.0, read=15.0, write=15.0, pool=15.0)
-            async with httpx.AsyncClient(follow_redirects=True, timeout=timeout) as client:
+            timeout = httpx.Timeout(
+                connect=5.0, read=15.0, write=15.0, pool=15.0
+            )
+            async with httpx.AsyncClient(
+                follow_redirects=True, timeout=timeout
+            ) as client:
                 for member in LIST_OF_MEMBERS:
                     url = member.get("Foto")
                     if not url:
@@ -111,12 +121,17 @@ class Birth(commands.Cog):
                         try:
                             resp = await client.get(url)
                             resp.raise_for_status()
-                            image_data_list.append({
-                                "bytes": resp.content,
-                                "filename": f"{member.get('Membro')}.png",
-                            })
+                            image_data_list.append(
+                                {
+                                    "bytes": resp.content,
+                                    "filename": f"{member.get('Membro')}.png",
+                                }
+                            )
                             break
-                        except (httpx.TimeoutException, httpx.RequestError) as err:
+                        except (
+                            httpx.TimeoutException,
+                            httpx.RequestError,
+                        ) as err:
                             if attempt == 0:
                                 await asyncio.sleep(1)
                                 continue
@@ -140,9 +155,7 @@ class Birth(commands.Cog):
 
             cargo_mentions = (
                 (
-                    " ".join(
-                        [cargo.mention for cargo in cargos if cargos]
-                    )
+                    " ".join([cargo.mention for cargo in cargos if cargos])
                     + "\n"
                 )
                 if cargos
@@ -172,18 +185,25 @@ class Birth(commands.Cog):
                     if idx >= 10:
                         break
                     preview_files.append(
-                        File(BytesIO(img_data["bytes"]), filename=img_data["filename"])
+                        File(
+                            BytesIO(img_data["bytes"]),
+                            filename=img_data["filename"],
+                        )
                     )
                 if total_photos > 10:
                     preview_message += f"(Mostrando 10 de {total_photos} fotos no preview)\n\n"
                 preview_message += "Deseja enviar esta mensagem ao canal?"
 
                 view = ConfirmView()
-                await dm_channel.send(preview_message, files=preview_files, view=view)
+                await dm_channel.send(
+                    preview_message, files=preview_files, view=view
+                )
                 await view.wait()
 
                 if view.value is None:
-                    await dm_channel.send("Tempo esgotado. Postagem cancelada.")
+                    await dm_channel.send(
+                        "Tempo esgotado. Postagem cancelada."
+                    )
                     return
                 if not view.value:
                     await write_report_log_async(
@@ -203,7 +223,7 @@ class Birth(commands.Cog):
             # Build final files from bytes (send in chunks of up to 10 files)
             def _chunk(lst, size):
                 for i in range(0, len(lst), size):
-                    yield lst[i:i + size]
+                    yield lst[i : i + size]
 
             all_files = [
                 File(BytesIO(img_data["bytes"]), filename=img_data["filename"])
@@ -256,7 +276,9 @@ class Birth(commands.Cog):
 
         if message.content.startswith("!birth"):
             await message.channel.send("Verificando aniversários...")
-            await self.verify_birthdays(manual=True, dm_channel=message.channel)
+            await self.verify_birthdays(
+                manual=True, dm_channel=message.channel
+            )
             await message.channel.send("Processo concluído!")
 
     @commands.Cog.listener()

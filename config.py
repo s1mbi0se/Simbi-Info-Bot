@@ -38,8 +38,14 @@ class Config(metaclass=SingletonMeta):
     BIRTHDAY_CARGOS = getenv("BIRTHDAY_CARGO_MENTION", default=None)
     BIRTHDAY_CARGOS = BIRTHDAY_CARGOS.split(",") if BIRTHDAY_CARGOS else None
 
-    BIRTHDAY_AUTHORIZED_USERS = getenv("BIRTHDAY_AUTHORIZED_USERS", default=None)
-    BIRTHDAY_AUTHORIZED_USERS = [int(user_id) for user_id in BIRTHDAY_AUTHORIZED_USERS.split(",")] if BIRTHDAY_AUTHORIZED_USERS else []
+    BIRTHDAY_AUTHORIZED_USERS = getenv(
+        "BIRTHDAY_AUTHORIZED_USERS", default=None
+    )
+    BIRTHDAY_AUTHORIZED_USERS = (
+        [int(user_id) for user_id in BIRTHDAY_AUTHORIZED_USERS.split(",")]
+        if BIRTHDAY_AUTHORIZED_USERS
+        else []
+    )
 
     # MERCADO TOPOGRAFICO ALLERTS
     MT_ALERTS_CHANNEL = int(getenv("MT_ALERTS_CHANNEL", default=0))
