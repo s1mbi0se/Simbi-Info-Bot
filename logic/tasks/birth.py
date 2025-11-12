@@ -286,7 +286,7 @@ class Birth(commands.Cog):
         print("Birth is ready")
         await write_report_log_async(sender="BIRTH", msg="STATUS - OK")
 
-        @schedule.task(daily.at("11:11"), name="Verify birthdays")
+        @schedule.task(daily.at("08:00"), name="Verify birthdays")
         async def verify_sheet():
             await self.verify_birthdays()
 
