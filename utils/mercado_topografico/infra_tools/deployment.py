@@ -1,6 +1,6 @@
 import os
-import paramiko
 
+import paramiko
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -15,9 +15,12 @@ SSH_KEY_PATH = os.path.expanduser(os.getenv("SSH_KEY_PATH"))
 
 SCRIPT_PATH_PROD = "/simbiose/script/shell/deployMercado/deployProduction/manualDeployProduction.sh"
 SCRIPT_PATH_wHITELABEL = "/simbiose/script/shell/deployMercado/deployWhiteLabel/manualDeployWhiteLabel.sh"
-SCRIPT_PATH_STAGE = "/simbiose/script/shell/deployMercado/deployStage/manualDeployStage.sh"
+SCRIPT_PATH_STAGE = (
+    "/simbiose/script/shell/deployMercado/deployStage/manualDeployStage.sh"
+)
 
-def deploy_production ():
+
+def deploy_production():
     ENVIRONMENT = "production"
     BRANCH = "main"
 
@@ -27,10 +30,10 @@ def deploy_production ():
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh.connect(
-            hostname=SSH_HOST_PROD01, 
+            hostname=SSH_HOST_PROD01,
             port=SSH_PORT,
             username=SSH_USER,
-            pkey=key            
+            pkey=key,
         )
 
         command = f"bash {SCRIPT_PATH_PROD} {ENVIRONMENT} {BRANCH}"
@@ -39,7 +42,7 @@ def deploy_production ():
         stdin, stdout, stderr = ssh.exec_command(command)
 
         print("Iniciando o deploy em Produção - PROD01...")
-       
+
         print("⚠️ STDERR:")
         print(stderr.read().decode())
 
@@ -50,10 +53,10 @@ def deploy_production ():
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh.connect(
-            hostname=SSH_HOST_PROD02, 
+            hostname=SSH_HOST_PROD02,
             port=SSH_PORT,
             username=SSH_USER,
-            pkey=key            
+            pkey=key,
         )
 
         command = f"bash {SCRIPT_PATH_PROD} {ENVIRONMENT} {BRANCH}"
@@ -62,7 +65,7 @@ def deploy_production ():
         stdin, stdout, stderr = ssh.exec_command(command)
 
         print("Iniciando o deploy em Produção - PROD02...")
-       
+
         print("⚠️ STDERR:")
         print(stderr.read().decode())
 
@@ -71,6 +74,7 @@ def deploy_production ():
 
     except Exception as e:
         print(f"❌ Ocorreu um erro: {e}")
+
 
 def deploy_whitelabel():
     ENVIRONMENT = "whitelabel"
@@ -82,10 +86,10 @@ def deploy_whitelabel():
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh.connect(
-            hostname=SSH_HOST_WHITELABEL, 
+            hostname=SSH_HOST_WHITELABEL,
             port=SSH_PORT,
             username=SSH_USER,
-            pkey=key            
+            pkey=key,
         )
 
         command = f"bash {SCRIPT_PATH_wHITELABEL} {ENVIRONMENT} {BRANCH}"
@@ -94,7 +98,7 @@ def deploy_whitelabel():
         stdin, stdout, stderr = ssh.exec_command(command)
 
         print("Iniciando o deploy em Whitelabel...")
-       
+
         print("⚠️ STDERR:")
         print(stderr.read().decode())
 
@@ -104,7 +108,8 @@ def deploy_whitelabel():
     except Exception as e:
         print(f"❌ Ocorreu um erro: {e}")
 
-def deploy_stage ()
+
+def deploy_stage():
     ENVIRONMENT = "stage"
     BRANCH = "develop"
 
@@ -114,10 +119,7 @@ def deploy_stage ()
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh.connect(
-            hostname=SSH_HOST_STAGE, 
-            port=SSH_PORT,
-            username=SSH_USER,
-            pkey=key            
+            hostname=SSH_HOST_STAGE, port=SSH_PORT, username=SSH_USER, pkey=key
         )
 
         command = f"bash {SCRIPT_PATH_STAGE} {ENVIRONMENT} {BRANCH}"
@@ -126,7 +128,7 @@ def deploy_stage ()
         stdin, stdout, stderr = ssh.exec_command(command)
 
         print("Iniciando o deploy em Stage...")
-       
+
         print("⚠️ STDERR:")
         print(stderr.read().decode())
 

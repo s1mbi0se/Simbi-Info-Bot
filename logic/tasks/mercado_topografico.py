@@ -9,12 +9,12 @@ from utils.mercado_topografico.azure_devops.estimate import estimated_efforts
 from utils.mercado_topografico.google_apis.presentation import (
     generate_presentation,
 )
-from utils.mercado_topografico.status_verify.utils_status_mt import ping_notify
 from utils.mercado_topografico.infra_tools.deployment import (
     deploy_production,
     deploy_stage,
     deploy_whitelabel,
 )
+from utils.mercado_topografico.status_verify.utils_status_mt import ping_notify
 
 load_dotenv()
 
@@ -48,9 +48,9 @@ class MercadoTopografico(commands.Cog):
             elif "prod" in message.content:
                 await self.deploy_production_command(message)
             elif "whitelabel" in message.content:
-                await self.deploy_whitelabel_command(message)    
+                await self.deploy_whitelabel_command(message)
             elif "homo" in message.content:
-                await self.deploy_stage_command(message)    
+                await self.deploy_stage_command(message)
             else:
                 await self.send_invalid_command_message(message)
 
@@ -129,7 +129,7 @@ class MercadoTopografico(commands.Cog):
         await message.channel.send(
             f"{message.author.mention} {deploy_message}"
         )
-    
+
     @staticmethod
     async def deploy_whitelabel_command(message):
         await message.channel.send(
@@ -150,7 +150,7 @@ class MercadoTopografico(commands.Cog):
         deploy_message = deploy_stage()
         await message.channel.send(
             f"{message.author.mention} {deploy_message}"
-        )    
+        )
 
     @staticmethod
     async def send_invalid_command_message(message):
