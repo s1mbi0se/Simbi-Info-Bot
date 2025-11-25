@@ -13,8 +13,12 @@ SSH_HOST_WHITELABEL = os.getenv("SSH_HOST_WHITELABEL")
 SSH_PORT = int(os.getenv("SSH_PORT", 22))
 SSH_KEY_PATH = os.path.expanduser(os.getenv("SSH_KEY_PATH"))
 
-SCRIPT_PATH_PROD = "/simbiose/script/shell/deployMercado/deployProduction/manualDeployProduction.sh"
-SCRIPT_PATH_wHITELABEL = "/simbiose/script/shell/deployMercado/deployWhiteLabel/manualDeployWhiteLabel.sh"
+SCRIPT_PATH_PROD = (
+    "/simbiose/script/shell/deployMercado/deployProduction/manualDeployProduction.sh"
+)
+SCRIPT_PATH_wHITELABEL = (
+    "/simbiose/script/shell/deployMercado/deployWhiteLabel/manualDeployWhiteLabel.sh"
+)
 SCRIPT_PATH_STAGE = (
     "/simbiose/script/shell/deployMercado/deployStage/manualDeployStage.sh"
 )
