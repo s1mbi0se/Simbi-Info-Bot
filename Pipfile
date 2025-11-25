@@ -21,6 +21,7 @@ google-auth-oauthlib = "*"
 azure-devops = "*"
 rocketry = "*"
 pydantic = "==1.10.10"
+paramiko = "==3.5.0"
 
 [dev-packages]
 
