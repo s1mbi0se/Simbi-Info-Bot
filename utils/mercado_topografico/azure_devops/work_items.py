@@ -124,9 +124,9 @@ def process_work_items_for_sprint(
             if is_current_sprint:
                 effort_estimated_list.append(work_item_effort)
 
-            if is_current_sprint and work_item_state == 'New':
+            if is_current_sprint and work_item_state == "New":
                 continue
-            if not is_current_sprint and work_item_state == 'Done':
+            if not is_current_sprint and work_item_state == "Done":
                 continue
 
             assigned_to = work_item.fields.get("System.AssignedTo", {})
@@ -172,7 +172,10 @@ def process_work_items_for_sprint(
                         )
                     )
 
-                    if task.fields["System.State"] == "Done" and task_effort > 0:
+                    if (
+                        task.fields["System.State"] == "Done"
+                        and task_effort > 0
+                    ):
                         effort_delivered_list.append(task_effort)
 
                     task_title = task.fields["System.Title"]

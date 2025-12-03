@@ -1,3 +1,4 @@
+import os
 from os import getenv
 
 import pytz
@@ -77,3 +78,15 @@ class Config(metaclass=SingletonMeta):
     IS_EMPTY = _verify_credentials(CREDENTIALS)
 
     TIME_ZONE = pytz.timezone("America/Sao_Paulo")
+
+    # Infra Tools - SSH Configs and Deployment Scripts
+    SCRIPT_PATH_PROD = getenv("SCRIPT_PATH_PROD")
+    SCRIPT_PATH_WHITELABEL = getenv("SCRIPT_PATH_WHITELABEL")
+    SCRIPT_PATH_STAGE = getenv("SCRIPT_PATH_STAGE")
+    SSH_USER = getenv("SSH_USER")
+    SSH_HOST_STAGE = getenv("SSH_HOST_STAGE")
+    SSH_HOST_PROD01 = getenv("SSH_HOST_PROD01")
+    SSH_HOST_PROD02 = getenv("SSH_HOST_PROD02")
+    SSH_HOST_WHITELABEL = getenv("SSH_HOST_WHITELABEL")
+    SSH_PORT = int(getenv("SSH_PORT", 22))
+    SSH_KEY_PATH = os.path.expanduser(getenv("SSH_KEY_PATH"))

@@ -1,13 +1,21 @@
 import os
+import asyncio
+import io
 
 from discord.ext import commands
 from discord.utils import get
 from dotenv import load_dotenv
+from discord import File
 
 from utils.logging import write_report_log_async
 from utils.mercado_topografico.azure_devops.estimate import estimated_efforts
 from utils.mercado_topografico.google_apis.presentation import (
     generate_presentation,
+)
+from utils.mercado_topografico.infra_tools.deployment import (
+    deploy_production,
+    deploy_stage,
+    deploy_whitelabel,
 )
 from utils.mercado_topografico.status_verify.utils_status_mt import ping_notify
 
@@ -40,6 +48,12 @@ class MercadoTopografico(commands.Cog):
                 await self.process_estimate_command(message)
             elif "verify" in message.content:
                 await self.process_verify_command(message)
+            elif "prod" in message.content:
+                await self.deploy_production_command(message)
+            elif "whitelabel" in message.content:
+                await self.deploy_whitelabel_command(message)
+            elif "homo" in message.content:
+                await self.deploy_stage_command(message)
             else:
                 await self.send_invalid_command_message(message)
 
@@ -109,6 +123,80 @@ class MercadoTopografico(commands.Cog):
         await message.channel.send(f"{message.author.mention} {response}")
 
     @staticmethod
+    async def deploy_production_command(message):
+        await message.channel.send(
+            "Um momento, vou iniciar o deploy para produção..."
+        )
+
+        loop = asyncio.get_event_loop()
+        deploy_message = await loop.run_in_executor(None, deploy_production)
+        
+        if len(deploy_message) > 2000:
+            file = File(
+                io.BytesIO(deploy_message.encode()),
+                filename="deploy_log.txt",
+            )
+            
+            await message.channel.send(
+                f"{message.author.mention} O deploy foi concluído, porem o log é muito grande. Enviando em anexo...",
+                file=file
+            )
+        
+        else:
+            await message.channel.send(
+                f"{message.author.mention} {deploy_message}"
+            )
+        
+    @staticmethod
+    async def deploy_whitelabel_command(message):
+        await message.channel.send(
+            "Um momento, vou iniciar o deploy para whitelabel..."
+        )
+        loop = asyncio.get_event_loop()
+        deploy_message = await loop.run_in_executor(None, deploy_whitelabel)
+        
+        if len(deploy_message) > 2000:
+            file = File(
+                io.BytesIO(deploy_message.encode()),
+                filename="deploy_log.txt",
+            )
+            
+            await message.channel.send(
+                f"{message.author.mention} O deploy foi concluído, porem o log é muito grande. Enviando em anexo...",
+                file=file
+            )
+            
+        else:
+            await message.channel.send(
+                f"{message.author.mention} {deploy_message}"
+            )
+
+    @staticmethod
+    async def deploy_stage_command(message):
+        await message.channel.send(
+            "Um momento, vou iniciar o deploy para homologação..."
+        )
+
+        loop = asyncio.get_event_loop()
+        deploy_message = await loop.run_in_executor(None, deploy_stage)
+        
+        if len(deploy_message) > 2000:
+            file = File(
+                io.BytesIO(deploy_message.encode()),
+                filename="deploy_log.txt",
+            )
+            
+            await message.channel.send(
+                f"{message.author.mention} O deploy foi concluído, porem o log é muito grande. Enviando em anexo...",
+                file=file
+            )
+        
+        else:
+            await message.channel.send(
+                f"{message.author.mention} {deploy_message}"
+            )
+
+    @staticmethod
     async def send_invalid_command_message(message):
         await message.channel.send(
             "### Comando inválido\n"
@@ -116,6 +204,9 @@ class MercadoTopografico(commands.Cog):
             "**!mt-presentation** para gerar a apresentação da sprint review\n"
             "**!mt-estimate** para obter as estimativas da sprint atual\n"
             "**!mt-verify** para obter o status das instâncias do Mercado Topografico\n"
+            "**!mt-prod** para deploy em produção\n"
+            "**!mt-whitelabel** para deploy em whitelabel\n"
+            "**!mt-homo** para deploy em homologação\n"
         )
 
     @commands.Cog.listener()
