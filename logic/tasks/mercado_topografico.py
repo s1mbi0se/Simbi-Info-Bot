@@ -32,14 +32,18 @@ class MercadoTopografico(commands.Cog):
         if message.author == self.bot.user:
             return
 
+        content = message.content or ""
+
+        # Se não for comando !mt ou !mt-gh-report, ignora
+        if "!mt" not in content and "!mt-gh-report" not in content:
+            return
+
         allowed_channel_id = int(
             os.getenv("CHANNEL_ALLOWED_FOR_PRESENTATION", default=0)
         )
         gh_report_channel_id = int(
             os.getenv("GH_REPORT_CHANNEL_ID", default=0)
         )
-
-        content = message.content or ""
 
         # Comandos gerais do MT (presentation, estimate, verify, report Azure)
         if "!mt" in content and "gh-report" not in content:
