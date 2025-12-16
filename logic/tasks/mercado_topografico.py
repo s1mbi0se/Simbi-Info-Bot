@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 from discord.ext import commands
 from discord.utils import get
@@ -6,6 +7,10 @@ from dotenv import load_dotenv
 
 from utils.logging import write_report_log_async
 from utils.mercado_topografico.azure_devops.estimate import estimated_efforts
+from utils.mercado_topografico.azure_devops.report import (
+    generate_period_report,
+)
+from utils.mercado_topografico.github_report import get_github_report, GitHubReportError
 from utils.mercado_topografico.google_apis.presentation import (
     generate_presentation,
 )
@@ -24,24 +29,39 @@ class MercadoTopografico(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        if message.author == self.bot.user:
+            return
+
         allowed_channel_id = int(
             os.getenv("CHANNEL_ALLOWED_FOR_PRESENTATION", default=0)
         )
-        if (
-            message.author == self.bot.user
-            or message.channel.id != allowed_channel_id
-        ):
-            return
+        gh_report_channel_id = int(
+            os.getenv("GH_REPORT_CHANNEL_ID", default=0)
+        )
 
-        if "!mt" in message.content:
-            if "presentation" in message.content:
+        content = message.content or ""
+
+        # Comandos gerais do MT (presentation, estimate, verify, report Azure)
+        if "!mt" in content and "gh-report" not in content:
+            if message.channel.id != allowed_channel_id:
+                return
+
+            if "presentation" in content:
                 await self.process_presentation_command(message)
-            elif "estimate" in message.content:
+            elif "estimate" in content:
                 await self.process_estimate_command(message)
-            elif "verify" in message.content:
+            elif "verify" in content:
                 await self.process_verify_command(message)
+            elif "report" in content:
+                await self.process_report_command(message)
             else:
                 await self.send_invalid_command_message(message)
+
+        # Comando específico de GitHub report pode rodar em outro canal
+        elif "!mt-gh-report" in content:
+            if gh_report_channel_id and message.channel.id != gh_report_channel_id:
+                return
+            await self.process_github_report_command(message)
 
     @staticmethod
     async def process_presentation_command(message):
@@ -107,6 +127,94 @@ class MercadoTopografico(commands.Cog):
             response += f"{status}\n"
 
         await message.channel.send(f"{message.author.mention} {response}")
+
+    @staticmethod
+    async def process_report_command(message):
+        content = message.content.strip()
+        parts = content.split()
+
+        if len(parts) != 3:
+            await message.channel.send(
+                "Uso incorreto. Use: **!mt-report dd-mm-aaaa dd-mm-aaaa**"
+            )
+            return
+
+        try:
+            start_date = datetime.strptime(parts[1], "%d-%m-%Y").date()
+            end_date = datetime.strptime(parts[2], "%d-%m-%Y").date()
+        except ValueError:
+            await message.channel.send(
+                "Datas inválidas. Use o formato **dd-mm-aaaa**, por exemplo: "
+                "`!mt-report 01-01-2025 16-12-2025`"
+            )
+            return
+
+        if start_date > end_date:
+            await message.channel.send(
+                "A data inicial não pode ser maior que a data final."
+            )
+            return
+
+        await message.channel.send(
+            "Um momento, estou gerando o relatório do período..."
+        )
+
+        try:
+            report_message = generate_period_report(start_date, end_date)
+        except Exception:
+            await message.channel.send(
+                "Não foi possível gerar o relatório agora. Tente novamente mais tarde."
+            )
+            return
+
+        await message.channel.send(f"{message.author.mention} {report_message}")
+
+    @staticmethod
+    async def process_github_report_command(message):
+        content = message.content.strip()
+        parts = content.split()
+
+        # Expected: !mt-gh-report dd-mm-aaaa dd-mm-aaaa <repo1> <repo2> ...
+        if len(parts) < 4:
+            await message.channel.send(
+                "Uso incorreto. Use: **!mt-gh-report dd-mm-aaaa dd-mm-aaaa repo_url1 repo_url2 ...**"
+            )
+            return
+
+        try:
+            start_date = datetime.strptime(parts[1], "%d-%m-%Y").date()
+            end_date = datetime.strptime(parts[2], "%d-%m-%Y").date()
+        except ValueError:
+            await message.channel.send(
+                "Datas inválidas. Use o formato **dd-mm-aaaa**, por exemplo: "
+                "`!mt-gh-report 01-01-2025 16-12-2025 https://github.com/org/repo`"
+            )
+            return
+
+        if start_date > end_date:
+            await message.channel.send(
+                "A data inicial não pode ser maior que a data final."
+            )
+            return
+
+        repo_urls = parts[3:]
+
+        await message.channel.send(
+            "Um momento, estou gerando o relatório do GitHub para os repositórios informados..."
+        )
+
+        try:
+            report_message = await get_github_report(repo_urls, start_date, end_date)
+        except GitHubReportError as e:
+            await message.channel.send(str(e))
+            return
+        except Exception:
+            await message.channel.send(
+                "Não foi possível gerar o relatório do GitHub agora. Tente novamente mais tarde."
+            )
+            return
+
+        await message.channel.send(f"{message.author.mention} {report_message}")
 
     @staticmethod
     async def send_invalid_command_message(message):
