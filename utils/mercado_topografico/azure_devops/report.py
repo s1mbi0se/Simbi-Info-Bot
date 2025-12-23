@@ -32,7 +32,7 @@ def get_report_data(start_date: date, end_date: date) -> dict:
     start_iso = start_date.strftime("%Y-%m-%d")
     end_iso = end_date.strftime("%Y-%m-%d")
 
-    # PBIs e Bugs concluídos no período (para esforço total e contagem de PBIs/Bugs)
+    # PBIs e Bugs concluídos no período (somente contagem)
     pbi_query = Wiql(
         query=(
             "SELECT [System.Id] "
@@ -48,18 +48,12 @@ def get_report_data(start_date: date, end_date: date) -> dict:
     pbi_list = client.query_by_wiql(pbi_query)
 
     pbi_done = 0
-    total_effort = 0.0
-
     if pbi_list.work_items is not None:
         for item in pbi_list.work_items:
-            work_item = client.get_work_item(id=item.id)
-            effort = float(
-                work_item.fields.get("Microsoft.VSTS.Scheduling.Effort", 0.0)
-            )
-            total_effort += effort
+            client.get_work_item(id=item.id)
             pbi_done += 1
 
-    # Tasks concluídas no período (todas)
+    # Tasks concluídas no período (pontuação deve vir das tasks)
     task_query = Wiql(
         query=(
             "SELECT [System.Id] "
@@ -75,10 +69,15 @@ def get_report_data(start_date: date, end_date: date) -> dict:
     task_list = client.query_by_wiql(task_query)
 
     task_done = 0
+    total_effort = 0.0
 
     if task_list.work_items is not None:
         for item in task_list.work_items:
-            client.get_work_item(id=item.id)
+            work_item = client.get_work_item(id=item.id)
+            effort = float(
+                work_item.fields.get("Microsoft.VSTS.Scheduling.Effort", 0.0)
+            )
+            total_effort += effort
             task_done += 1
 
     return {
