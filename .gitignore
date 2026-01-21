@@ -111,6 +111,7 @@ env.bak/
 venv.bak/
 
 #Secrets
+*.pem
 credentials.json
 token.json
 
@@ -137,3 +138,6 @@ dmypy.json
 
 # Pipfile
 *.lock
+
+# ASDF
+.tool-versions
