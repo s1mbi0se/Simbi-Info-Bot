@@ -64,14 +64,14 @@ class MercadoTopografico(commands.Cog):
                 await self.process_estimate_command(message)
             elif "verify" in content:
                 await self.process_verify_command(message)
-            elif "report" in content:
-                await self.process_report_command(message)
             elif "prod" in content:
                 await self.deploy_production_command(message)
             elif "whitelabel" in content:
                 await self.deploy_whitelabel_command(message)
             elif "homo" in content:
                 await self.deploy_stage_command(message)
+            elif "report" in content:
+                await self.process_report_command(message)
             else:
                 await self.send_invalid_command_message(message)
 
@@ -155,23 +155,23 @@ class MercadoTopografico(commands.Cog):
 
         loop = asyncio.get_event_loop()
         deploy_message = await loop.run_in_executor(None, deploy_production)
-
+        
         if len(deploy_message) > 2000:
             file = File(
                 io.BytesIO(deploy_message.encode()),
                 filename="deploy_log.txt",
             )
-
+            
             await message.channel.send(
                 f"{message.author.mention} O deploy foi concluído, porem o log é muito grande. Enviando em anexo...",
                 file=file
             )
-
+        
         else:
             await message.channel.send(
                 f"{message.author.mention} {deploy_message}"
             )
-
+        
     @staticmethod
     async def deploy_whitelabel_command(message):
         await message.channel.send(
@@ -179,18 +179,18 @@ class MercadoTopografico(commands.Cog):
         )
         loop = asyncio.get_event_loop()
         deploy_message = await loop.run_in_executor(None, deploy_whitelabel)
-
+        
         if len(deploy_message) > 2000:
             file = File(
                 io.BytesIO(deploy_message.encode()),
                 filename="deploy_log.txt",
             )
-
+            
             await message.channel.send(
                 f"{message.author.mention} O deploy foi concluído, porem o log é muito grande. Enviando em anexo...",
                 file=file
             )
-
+            
         else:
             await message.channel.send(
                 f"{message.author.mention} {deploy_message}"
@@ -204,24 +204,22 @@ class MercadoTopografico(commands.Cog):
 
         loop = asyncio.get_event_loop()
         deploy_message = await loop.run_in_executor(None, deploy_stage)
-
+        
         if len(deploy_message) > 2000:
             file = File(
                 io.BytesIO(deploy_message.encode()),
                 filename="deploy_log.txt",
             )
-
+            
             await message.channel.send(
                 f"{message.author.mention} O deploy foi concluído, porem o log é muito grande. Enviando em anexo...",
                 file=file
             )
-
+        
         else:
             await message.channel.send(
                 f"{message.author.mention} {deploy_message}"
             )
-
-    @staticmethod
     async def process_report_command(message):
         content = message.content.strip()
         parts = content.split()
