@@ -110,9 +110,10 @@ class MercadoTopografico(commands.Cog):
             "https://www.geomarkett.com",
             "https://geomarkett.cl",
             "https://www.geomarkett.cl",
-            "https://teste.mercadotopografico.com.br",
-            "https://devtest.mercadotopografico.com.br",
-            "https://app.mercadotopografico.com.br",
+            "https://mtteste.com.br/",
+            "https://www.mtteste.com.br",
+            "https://devtest.mtteste.com.br",
+            "https://app.mtteste.com.br",
         ]
 
         response = f"\nSTATUS DAS INSTÂNCIAS:\n"
