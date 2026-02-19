@@ -120,9 +120,9 @@ def deploy_whitelabel():
         return f"❌ Ocorreu um erro: {e}"
 
 
-def deploy_stage():
+def deploy_stage(branch):
     ENVIRONMENT = "stage"
-    BRANCH = "develop"
+    BRANCH = branch
 
     try:
         print("🔐 Iniciando conexão SSH...")
