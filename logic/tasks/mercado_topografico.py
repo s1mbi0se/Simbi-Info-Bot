@@ -196,14 +196,64 @@ class MercadoTopografico(commands.Cog):
                 f"{message.author.mention} {deploy_message}"
             )
 
-    @staticmethod
-    async def deploy_stage_command(message):
+    async def deploy_stage_command(self, message):
         await message.channel.send(
-            "Um momento, vou iniciar o deploy para homologação..."
+            "Qual branch deseja fazer o deploy para homologação?"
+        )
+
+        def check(m):
+            return (
+                m.author == message.author and
+                m.channel == message.channel
+            )
+
+        try:
+            response = await self.bot.wait_for(
+                "message",
+                check=check,
+                timeout=60
+            )
+        except asyncio.TimeoutError:
+            await message.channel.send(
+                f"{message.author.mention} Tempo esgotado. Deploy cancelado."
+            )
+            return
+
+        branch = response.content.strip()
+
+        await message.channel.send(
+            f"{message.author.mention} Você confirma o deploy da branch '{branch}' para homologação?\n"
+            "Responda com 'sim' para confirmar e 'não' para cancelar."
+        )
+
+        try:
+            confirmation = await self.bot.wait_for(
+                "message",
+                check=check,
+                timeout=30
+            )
+        except asyncio.TimeoutError:
+            await message.channel.send(
+                f"{message.author.mention} Tempo esgotado. Deploy cancelado."
+            )
+            return
+
+        if confirmation.content.lower() not in ["sim", "s", "yes", "y"]:
+            await message.channel.send(
+                f"{message.author.mention} Deploy cancelado."
+            )
+            return
+
+        await message.channel.send(
+            f"Perfeito 👍 Iniciando deploy da branch `{branch}`..."
         )
 
         loop = asyncio.get_event_loop()
-        deploy_message = await loop.run_in_executor(None, deploy_stage)
+        deploy_message = await loop.run_in_executor(
+            None,
+            deploy_stage,
+            branch
+        )
         
         if len(deploy_message) > 2000:
             file = File(
@@ -220,6 +270,7 @@ class MercadoTopografico(commands.Cog):
             await message.channel.send(
                 f"{message.author.mention} {deploy_message}"
             )
+
     async def process_report_command(message):
         content = message.content.strip()
         parts = content.split()
