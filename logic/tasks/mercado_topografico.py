@@ -196,8 +196,7 @@ class MercadoTopografico(commands.Cog):
                 f"{message.author.mention} {deploy_message}"
             )
 
-    @staticmethod
-    async def deploy_stage_command(message):
+    async def deploy_stage_command(self, message):
         await message.channel.send(
             "Qual branch deseja fazer o deploy para homologação?"
         )
@@ -209,7 +208,7 @@ class MercadoTopografico(commands.Cog):
             )
 
         try:
-            response = await message.client.wait_for(
+            response = await self.bot.wait_for(
                 "message",
                 check=check,
                 timeout=60
@@ -228,7 +227,7 @@ class MercadoTopografico(commands.Cog):
         )
 
         try:
-            confirmation = await message.client.wait_for(
+            confirmation = await self.bot.wait_for(
                 "message",
                 check=check,
                 timeout=30
@@ -237,6 +236,7 @@ class MercadoTopografico(commands.Cog):
             await message.channel.send(
                 f"{message.author.mention} Tempo esgotado. Deploy cancelado."
             )
+            return
 
         if confirmation.content.lower() not in ["sim", "s", "yes", "y"]:
             await message.channel.send(
