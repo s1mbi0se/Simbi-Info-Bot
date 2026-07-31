@@ -11,7 +11,8 @@ COPY .env credentials.json ./
 COPY Pipfile Pipfile.lock ./
 
 # Instala as dependências do projeto
-RUN pip install pipenv && pipenv install --system --deploy
+RUN pip install --no-cache-dir pipenv==2023.12.1 \
+	&& pipenv install --system --deploy
 
 # Copia o restante do código para o container
 COPY . .
