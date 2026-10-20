@@ -157,8 +157,8 @@ class MercadoTopografico(commands.Cog):
         loop = asyncio.get_event_loop()
         restart_message = await loop.run_in_executor(None, restart_production)
         
-    await message.channel.send(
-        f"{message.author.mention} {restart_message}"
+        await message.channel.send(
+            f"{message.author.mention} {restart_message}"
     )
     
     @staticmethod
@@ -170,8 +170,8 @@ class MercadoTopografico(commands.Cog):
         loop = asyncio.get_event_loop()
         restart_message = await loop.run_in_executor(None, restart_stage)
         
-    await message.channel.send(
-        f"{message.author.mention} {restart_message}"
+        await message.channel.send(
+            f"{message.author.mention} {restart_message}"
     )    
 
     @staticmethod
