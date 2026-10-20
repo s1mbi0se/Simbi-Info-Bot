@@ -66,7 +66,6 @@ def remove_keys(password):
 
         final_log = (
             f"=== REMOVER CHAVES ===\n"
-            f"BRANCH: {BRANCH}\n\n"
             f"--- {log1['label']} ---\n"
             f"📄 STDOUT:\n{log1['stdout'] or '(vazio)'}\n\n"
             f"⚠️ STDERR:\n{log1['stderr'] or '(vazio)'}\n\n"
