@@ -22,7 +22,7 @@ def remove_keys(password):
             pkey=key,
         )
 
-        infra_tools=(config.INFRA_TOOLS)
+        infra_tools=(Config.INFRA_TOOLS)
         script_path = shlex.quote(Config.REMOVE_KEYS_PATH)
         password = shlex.quote(PASSWORD)
 
