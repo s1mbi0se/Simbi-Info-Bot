@@ -232,7 +232,7 @@ def restart_production():
     except Exception as e:
         return f"❌ Ocorreu um erro: {e}"
 
-def restart_stage(branch):
+def restart_stage():
     ENVIRONMENT = "stage"
     
     try:
