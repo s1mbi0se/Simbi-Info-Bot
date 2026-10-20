@@ -22,11 +22,12 @@ def remove_keys(password):
             pkey=key,
         )
 
+        infra_tools=(config.INFRA_TOOLS)
         script_path = shlex.quote(Config.REMOVE_KEYS_PATH)
         password = shlex.quote(PASSWORD)
 
         command = (
-            f"source ~/.bashrc && "
+            f"source {infra_tools} && "
             f"bash {script_path} {password}"
         )
         
