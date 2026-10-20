@@ -164,7 +164,7 @@ class MercadoTopografico(commands.Cog):
         
         await message.channel.send(
             f"{message.author.mention} {restart_message}"
-    )
+        )
     
     @staticmethod
     async def restart_stage_command(message):
@@ -177,9 +177,8 @@ class MercadoTopografico(commands.Cog):
         
         await message.channel.send(
             f"{message.author.mention} {restart_message}"
-    )
+        )
     
-    @staticmethod
     async def remove_keys_command(self,message):
         await message.channel.send(
             "Senha de segurança necessária para remover as chaves pem:"
