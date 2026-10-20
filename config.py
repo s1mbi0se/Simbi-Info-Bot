@@ -86,6 +86,7 @@ class Config(metaclass=SingletonMeta):
     RESTART_PATH_PROD = getenv("RESTART_PATH_PROD")
     RESTART_PATH_STAGE = getenv("RESTART_PATH_STAGE")
     REMOVE_KEYS_PATH = getenv("REMOVE_KEYS_PATH")
+    INFRA_TOOLS = getenv("INFRA_TOOLS")
     SSH_USER = getenv("SSH_USER")
     SSH_HOST_STAGE = getenv("SSH_HOST_STAGE")
     SSH_HOST_PROD01 = getenv("SSH_HOST_PROD01")

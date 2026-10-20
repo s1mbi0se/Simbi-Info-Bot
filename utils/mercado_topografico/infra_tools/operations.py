@@ -2,6 +2,8 @@ import os
 
 import paramiko
 
+import shlex
+
 from config import Config
 
 def remove_keys(password):
@@ -20,7 +22,15 @@ def remove_keys(password):
             pkey=key,
         )
 
-        command = f"bash {Config.REMOVE_KEYS_PATH} {PASSWORD}"
+        infra_tools=(Config.INFRA_TOOLS)
+        script_path = shlex.quote(Config.REMOVE_KEYS_PATH)
+        password = shlex.quote(PASSWORD)
+
+        command = (
+            f"source {infra_tools} && "
+            f"bash {script_path} {password}"
+        )
+        
         print(f"🚀 Executando comando em {label}: {command}")
 
         stdin, stdout, stderr = ssh.exec_command(command)
@@ -56,7 +66,6 @@ def remove_keys(password):
 
         final_log = (
             f"=== REMOVER CHAVES ===\n"
-            f"BRANCH: {BRANCH}\n\n"
             f"--- {log1['label']} ---\n"
             f"📄 STDOUT:\n{log1['stdout'] or '(vazio)'}\n\n"
             f"⚠️ STDERR:\n{log1['stderr'] or '(vazio)'}\n\n"
