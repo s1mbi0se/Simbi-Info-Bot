@@ -227,7 +227,7 @@ def restart_production():
         if log1["exit_code"] != 0 or log2["exit_code"] != 0:
             return f"❌ Erro durante o restart!\n\n{final_log}"
 
-        return f"✅ Restart em Produção concluído com sucesso!\n\n{final_log}"
+        return f"✅ Restart em Produção concluído com sucesso!"
         
     except Exception as e:
         return f"❌ Ocorreu um erro: {e}"
@@ -270,7 +270,7 @@ def restart_stage():
         if exit_code != 0:
             return f"❌ Erro durante o restart do servidor em Stage:\n{stderr_msg}"
 
-        return f"✅ Restart em Stage concluído.\n{stdout_msg}"
+        return f"✅ Restart em Stage concluído."
 
     except Exception as e:
         return f"❌ Ocorreu um erro: {e}"
