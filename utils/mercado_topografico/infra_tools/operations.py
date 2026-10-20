@@ -2,6 +2,8 @@ import os
 
 import paramiko
 
+import shlex
+
 from config import Config
 
 def remove_keys(password):
@@ -20,7 +22,14 @@ def remove_keys(password):
             pkey=key,
         )
 
-        command = f"bash {Config.REMOVE_KEYS_PATH} {PASSWORD}"
+        script_path = shlex.quote(Config.REMOVE_KEYS_PATH)
+        password = shlex.quote(PASSWORD)
+
+        command = (
+            f"source ~/.bashrc && "
+            f"bash {script_path} {password}"
+        )
+        
         print(f"🚀 Executando comando em {label}: {command}")
 
         stdin, stdout, stderr = ssh.exec_command(command)
