@@ -21,6 +21,8 @@ from utils.mercado_topografico.infra_tools.deployment import (
     deploy_production,
     deploy_stage,
     deploy_whitelabel,
+    restart_production,
+    restart_stage,
 )
 from utils.mercado_topografico.status_verify.utils_status_mt import ping_notify
 
@@ -70,6 +72,10 @@ class MercadoTopografico(commands.Cog):
                 await self.deploy_whitelabel_command(message)
             elif "homo" in content:
                 await self.deploy_stage_command(message)
+            elif "restartp" in content:
+                await self.restart_production_command(message)
+            elif "restarth" in content:
+                await self.restart_stage_command(message)
             elif "report" in content:
                 await self.process_report_command(message)
             else:
@@ -130,14 +136,9 @@ class MercadoTopografico(commands.Cog):
             "https://prod01.mercadotopografico.com.br",
             "https://prod02.mercadotopografico.com.br",
             "https://www.mercadotopografico.com.br",
-            "https://geomarkett.com",
-            "https://www.geomarkett.com",
-            "https://geomarkett.cl",
-            "https://www.geomarkett.cl",
             "https://mtteste.com.br",
             "https://www.mtteste.com.br",
             "https://devtest.mtteste.com.br",
-            "https://app.mtteste.com.br",
         ]
 
         response = f"\nSTATUS DAS INSTÂNCIAS:\n"
@@ -146,6 +147,32 @@ class MercadoTopografico(commands.Cog):
             response += f"{status}\n"
 
         await message.channel.send(f"{message.author.mention} {response}")
+
+    @staticmethod
+    async def restart_production_command(message):
+        await message.channel.send(
+            "Um momento, vou reiniciar a produção..."
+        )
+        
+        loop = asyncio.get_event_loop()
+        restart_message = await loop.run_in_executor(None, restart_production)
+        
+    await message.channel.send(
+        f"{message.author.mention} {restart_message}"
+    )
+    
+    @staticmethod
+    async def restart_stage_command(message):
+        await message.channel.send(
+            "Um momento, vou reiniciar a stage..."
+        )
+        
+        loop = asyncio.get_event_loop()
+        restart_message = await loop.run_in_executor(None, restart_stage)
+        
+    await message.channel.send(
+        f"{message.author.mention} {restart_message}"
+    )    
 
     @staticmethod
     async def deploy_production_command(message):
@@ -369,6 +396,8 @@ class MercadoTopografico(commands.Cog):
             "**!mt-prod** para deploy em produção\n"
             "**!mt-whitelabel** para deploy em whitelabel\n"
             "**!mt-homo** para deploy em homologação\n"
+            "**!mt-restartp** para restart em produção\n"
+            "**!mt-restarth** para restart em homologação\n"
         )
 
     @commands.Cog.listener()
