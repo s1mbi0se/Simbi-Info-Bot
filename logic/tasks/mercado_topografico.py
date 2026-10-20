@@ -24,6 +24,9 @@ from utils.mercado_topografico.infra_tools.deployment import (
     restart_production,
     restart_stage,
 )
+from utils.mercado_topografico.infra_tools.operations import (
+    remove_keys,    
+)
 from utils.mercado_topografico.status_verify.utils_status_mt import ping_notify
 
 load_dotenv()
@@ -76,6 +79,8 @@ class MercadoTopografico(commands.Cog):
                 await self.restart_production_command(message)
             elif "restarth" in content:
                 await self.restart_stage_command(message)
+            elif "remove" in content:
+                await self.remove_keys_command(message)
             elif "report" in content:
                 await self.process_report_command(message)
             else:
@@ -172,7 +177,48 @@ class MercadoTopografico(commands.Cog):
         
         await message.channel.send(
             f"{message.author.mention} {restart_message}"
-    )    
+    )
+    
+    @staticmethod
+    async def remove_keys_command(self,message):
+        await message.channel.send(
+            "Senha de segurança necessária para remover as chaves pem:"
+        )
+
+        def check(m):
+            return (
+                m.author == message.author and
+                m.channel == message.channel
+            )
+
+        try:
+            response = await self.bot.wait_for(
+                "message",
+                check=check,
+                timeout=60
+            )
+        except asyncio.TimeoutError:
+            await message.channel.send(
+                f"{message.author.mention} Tempo esgotado. Operação cancelada."
+            )
+            return
+
+        password = response.content.strip()
+
+        await message.channel.send(
+            "Um momento, vou remover as chaves..."
+        )
+
+        loop = asyncio.get_event_loop()
+        remove_message = await loop.run_in_executor(
+            None,
+            remove_keys,
+            password
+        )
+        
+        await message.channel.send(
+            f"{message.author.mention} {remove_message}"
+        )
 
     @staticmethod
     async def deploy_production_command(message):
@@ -398,6 +444,7 @@ class MercadoTopografico(commands.Cog):
             "**!mt-homo** para deploy em homologação\n"
             "**!mt-restartp** para restart em produção\n"
             "**!mt-restarth** para restart em homologação\n"
+            "**!mt-remove** para remover as chaves de acesso\n"
         )
 
     @commands.Cog.listener()
