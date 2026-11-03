@@ -153,19 +153,56 @@ class MercadoTopografico(commands.Cog):
 
         await message.channel.send(f"{message.author.mention} {response}")
 
-    @staticmethod
-    async def restart_production_command(message):
+    async def restart_production_command(self, message):
+        await message.channel.send(
+            "Qual servidor deseja reiniciar?\n\n"
+            "**1.**   Para reiniciar o servidor PROD01\n"
+            "**2.**   Para reiniciar o servidor PROD02\n"
+            "**3.**   Para reiniciar ambos os servidores\n\n"
+            "Responda com o número correspondente."
+        )
+
+        def check(m):
+            return (
+                m.author == message.author and
+                m.channel == message.channel
+            )
+
+        try:
+            response = await self.bot.wait_for(
+                "message",
+                check=check,
+                timeout=60
+            )
+        except asyncio.TimeoutError:
+            await message.channel.send(
+                f"{message.author.mention} Tempo esgotado. Operação cancelada."
+            )
+            return
+
+        option = response.content.strip()
+
+        if option not in ("1", "2", "3"):
+            await message.channel.send(
+                f"{message.author.mention} Opção inválida. Operação cancelada."
+            )
+            return
+
         await message.channel.send(
             "Um momento, vou reiniciar a produção..."
         )
-        
-        loop = asyncio.get_event_loop()
-        restart_message = await loop.run_in_executor(None, restart_production)
-        
+
+        loop = asyncio.get_running_loop()
+        restart_message = await loop.run_in_executor(
+            None,
+            restart_production,
+            option
+        )
+
         await message.channel.send(
             f"{message.author.mention} {restart_message}"
         )
-    
+
     @staticmethod
     async def restart_stage_command(message):
         await message.channel.send(
