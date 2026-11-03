@@ -164,73 +164,136 @@ def deploy_stage(branch):
     except Exception as e:
         return f"❌ Ocorreu um erro: {e}"
     
-def restart_production():
+
+def restart_production(option):
     ENVIRONMENT = "production"
 
-    key = paramiko.RSAKey.from_private_key_file(Config.SSH_KEY_PATH)
+    servers = {
+        "1": (Config.SSH_HOST_PROD01, "Produção - PROD01"),
+        "2": (Config.SSH_HOST_PROD02, "Produção - PROD02"),
+    }
 
-    def execute_on_host(hostname, label):
-        print(f"🔐 Iniciando conexão SSH em {label}...")
-        ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(
-            hostname=hostname,
-            port=Config.SSH_PORT,
-            username=Config.SSH_USER,
-            pkey=key,
-        )
+    # Valida a opção recebida do Discord
+    if option not in ("1", "2", "3"):
+        return "❌ Opção inválida. Escolha 1, 2 ou 3."
 
-        command = f"bash {Config.RESTART_PATH_PROD} {ENVIRONMENT}"
-        print(f"🚀 Executando comando em {label}: {command}")
-
-        stdin, stdout, stderr = ssh.exec_command(command)
-
-        print(f"Reiniciando o servidor em {label}...")
-
-        stdout_msg = stdout.read().decode().strip()
-        stderr_msg = stderr.read().decode().strip()
-        exit_code = stdout.channel.recv_exit_status()
-        
-        print("📄 STDOUT:")
-        print(stdout_msg)
-        
-        print("⚠️ STDERR:")
-        print(stderr_msg)
-
-        ssh.close()
-        print(f"✅ Restart em {label} concluído.")
-        
-        return {
-            "label": label,
-            "stdout": stdout_msg,
-            "stderr": stderr_msg,
-            "exit_code": exit_code
-        }
+    # Define quais servidores serão reiniciados
+    if option == "3":
+        selected_servers = [
+            servers["1"],
+            servers["2"],
+        ]
+    else:
+        selected_servers = [servers[option]]
 
     try:
-        log1 = execute_on_host(Config.SSH_HOST_PROD01, "Produção - PROD01")
-        log2 = execute_on_host(Config.SSH_HOST_PROD02, "Produção - PROD02")
-
-        final_log = (
-            f"=== RESTART PRODUÇÃO ===\n"
-            f"--- {log1['label']} ---\n"
-            f"📄 STDOUT:\n{log1['stdout'] or '(vazio)'}\n\n"
-            f"⚠️ STDERR:\n{log1['stderr'] or '(vazio)'}\n\n"
-            f"Exit Code: {log1['exit_code']}\n\n"
-            
-            f"--- {log2['label']} ---\n"
-            f"📄 STDOUT:\n{log2['stdout'] or '(vazio)'}\n\n"
-            f"⚠️ STDERR:\n{log2['stderr'] or '(vazio)'}\n"
-            f"Exit Code: {log2['exit_code']}\n\n"
+        key = paramiko.RSAKey.from_private_key_file(
+            Config.SSH_KEY_PATH
         )
-        
-        if log1["exit_code"] != 0 or log2["exit_code"] != 0:
-            return f"❌ Erro durante o restart!\n\n{final_log}"
 
-        return f"✅ Restart em Produção concluído com sucesso!"
-        
+        results = []
+
+        def execute_on_host(hostname, label):
+            ssh = paramiko.SSHClient()
+            ssh.set_missing_host_key_policy(
+                paramiko.AutoAddPolicy()
+            )
+
+            try:
+                print(f"🔐 Conectando em {label}...")
+
+                ssh.connect(
+                    hostname=hostname,
+                    port=Config.SSH_PORT,
+                    username=Config.SSH_USER,
+                    pkey=key,
+                    timeout=15,
+                    banner_timeout=15,
+                    auth_timeout=15,
+                )
+
+                command = (
+                    f"bash {Config.RESTART_PATH_PROD} "
+                    f"{ENVIRONMENT}"
+                )
+
+                print(
+                    f"🚀 Executando em {label}: {command}"
+                )
+
+                stdin, stdout, stderr = ssh.exec_command(
+                    command,
+                    timeout=120
+                )
+
+                stdout_msg = stdout.read().decode().strip()
+                stderr_msg = stderr.read().decode().strip()
+                exit_code = stdout.channel.recv_exit_status()
+
+                return {
+                    "label": label,
+                    "stdout": stdout_msg,
+                    "stderr": stderr_msg,
+                    "exit_code": exit_code,
+                }
+
+            finally:
+                ssh.close()
+
+        # Executa somente nos servidores selecionados
+        for hostname, label in selected_servers:
+            try:
+                result = execute_on_host(hostname, label)
+                results.append(result)
+
+            except Exception as e:
+                results.append({
+                    "label": label,
+                    "stdout": "",
+                    "stderr": str(e),
+                    "exit_code": -1,
+                })
+
+        # Monta o relatório final
+        final_log = []
+
+        for result in results:
+            final_log.append(
+                f"--- {result['label']} ---\n"
+                f"📄 STDOUT:\n"
+                f"{result['stdout'] or '(vazio)'}\n\n"
+                f"⚠️ STDERR:\n"
+                f"{result['stderr'] or '(vazio)'}\n\n"
+                f"Exit Code: {result['exit_code']}"
+            )
+
+        report = "\n\n".join(final_log)
+
+        # Verifica se houve falha em algum servidor
+        failed = any(
+            result["exit_code"] != 0
+            for result in results
+        )
+
+        if failed:
+            return (
+                "❌ Erro durante o restart da produção!\n\n"
+                f"{report}"
+            )
+
+        server_names = ", ".join(
+            result["label"] for result in results
+        )
+
+        return (
+            f"✅ Restart concluído com sucesso!\n"
+            f"Servidores: {server_names}\n\n"
+            f"{report}"
+        )
+
     except Exception as e:
-        return f"❌ Ocorreu um erro: {e}"
+        return f"❌ Erro ao preparar o restart: {e}"
+
 
 def restart_stage():
     ENVIRONMENT = "stage"
