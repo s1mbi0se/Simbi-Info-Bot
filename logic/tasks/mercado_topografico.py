@@ -153,7 +153,6 @@ class MercadoTopografico(commands.Cog):
 
         await message.channel.send(f"{message.author.mention} {response}")
 
-    
     async def restart_production_command(self, message):
         await message.channel.send(
             "Qual servidor deseja reiniciar?\n"
@@ -204,8 +203,6 @@ class MercadoTopografico(commands.Cog):
             f"{message.author.mention} {restart_message}"
         )
 
-        
-    
     @staticmethod
     async def restart_stage_command(message):
         await message.channel.send(

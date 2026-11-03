@@ -173,11 +173,9 @@ def restart_production(option):
         "2": (Config.SSH_HOST_PROD02, "Produção - PROD02"),
     }
 
-    # Valida a opção recebida do Discord
     if option not in ("1", "2", "3"):
         return "❌ Opção inválida. Escolha 1, 2 ou 3."
 
-    # Define quais servidores serão reiniciados
     if option == "3":
         selected_servers = [
             servers["1"],
@@ -240,7 +238,6 @@ def restart_production(option):
             finally:
                 ssh.close()
 
-        # Executa somente nos servidores selecionados
         for hostname, label in selected_servers:
             try:
                 result = execute_on_host(hostname, label)
@@ -254,7 +251,6 @@ def restart_production(option):
                     "exit_code": -1,
                 })
 
-        # Monta o relatório final
         final_log = []
 
         for result in results:
@@ -269,7 +265,6 @@ def restart_production(option):
 
         report = "\n\n".join(final_log)
 
-        # Verifica se houve falha em algum servidor
         failed = any(
             result["exit_code"] != 0
             for result in results
