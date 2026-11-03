@@ -283,7 +283,6 @@ def restart_production(option):
         return (
             f"✅ Restart concluído com sucesso!\n"
             f"Servidores: {server_names}\n\n"
-            f"{report}"
         )
 
     except Exception as e:
