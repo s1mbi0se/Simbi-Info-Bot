@@ -155,10 +155,10 @@ class MercadoTopografico(commands.Cog):
 
     async def restart_production_command(self, message):
         await message.channel.send(
-            "Qual servidor deseja reiniciar?\n"
-            "**1.** Para reiniciar o servidor PROD01\n"
-            "**2.** Para reiniciar o servidor PROD02\n"
-            "**3.** Para reiniciar ambos os servidores\n\n"
+            "Qual servidor deseja reiniciar?\n\n"
+            "**1.**   Para reiniciar o servidor PROD01\n"
+            "**2.**   Para reiniciar o servidor PROD02\n"
+            "**3.**   Para reiniciar ambos os servidores\n\n"
             "Responda com o número correspondente."
         )
 
